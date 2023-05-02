@@ -113,11 +113,12 @@ public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
         Period period = Period.between(start, end);
 
         int days = period.getDays() + 1;
-        int months = period.getMonths() + 1;
+        int months = period.getMonths() + 3;
 
+        // random date from 20230101 ~ 20231231
         return start
-                .plusDays(random.nextInt(days))
-                .plusMonths((random.nextInt(months)))
+                .plusDays(random.nextInt(32))
+                .plusMonths((random.nextInt(13)))
                 .atTime(23, 59);
     }
 
