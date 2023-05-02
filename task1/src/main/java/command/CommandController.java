@@ -15,130 +15,29 @@ import java.util.Objects;
  * */
 public class CommandController {
 
-    private final int itemCodeLength;
-    private final int shopCodeLength;
-    private final String itemCodeCharset;
-    private final String shopCodeCharset;
-    private final VoucherService voucherService;
-    private final CodeGeneratorConfigGetter codeGeneratorConfigGetter;
-
-    public CommandController(VoucherService voucherService, CodeGeneratorConfigGetter codeGeneratorConfigGetter) {
-        this.voucherService = voucherService;
-        this.codeGeneratorConfigGetter = codeGeneratorConfigGetter;
-        this.itemCodeLength = codeGeneratorConfigGetter.getItemCodeConfig().getLength();
-        this.itemCodeCharset = codeGeneratorConfigGetter.getItemCodeConfig().getCharset();
-        this.shopCodeLength = codeGeneratorConfigGetter.getShopCodeConfig().getLength();
-        this.shopCodeCharset = codeGeneratorConfigGetter.getShopCodeConfig().getCharset();
-    }
-
     public String validateCommand(String input) {
 
-        String[] segments = segmentInput(input);
+        String[] segments = segment(input);
         String commandSegment = segments[0].toUpperCase();
 
-        Command command = Arrays.stream(Command.values())
-                .filter(c -> commandSegment.equals(c.getDesc()))
+        CommandEnum command = Arrays.stream(CommandEnum.values())
+                .filter(c -> c.equals(CommandEnum.valueOf(commandSegment)))
                 .findFirst()
-                .orElseThrow( () -> new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MISTYPED_COMMAND));
+                .orElseThrow(() -> new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MISTYPED_COMMAND));
 
-        if (command == Command.CHECK) {
-            if (segments.length != 4) {
-                throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-            }
-
-            String[] codeSegment = Arrays.copyOfRange(segments, 1, segments.length);
-            String code = createValidatedItemCodeFrom(codeSegment);
-
-            return voucherService.check(code);
-
-        } else if (command == Command.HELP) {
-
-            return voucherService.help();
-
-        } else if (command == Command.CLAIM) {
-
-            String shopCodeRegex = getRegex(shopCodeCharset);
-
-            if (segments.length != 5) {
-                throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-            }
-
-            String shopCode = segments[1];
-
-            if (shopCode.length() != shopCodeLength || !shopCode.matches(shopCodeRegex)) {
-                throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-            }
-
-            String[] codeSegment = Arrays.copyOfRange(segments, 2, segments.length);
-            String itemCode = createValidatedItemCodeFrom(codeSegment);
-
-            return voucherService.claim(shopCode, itemCode);
-
-        } else if (command == Command.EXIT) {
-            return Command.EXIT.getDesc();
-        }
-
-        throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MISTYPED_COMMAND);
+        return command.process(input);
 
     }
 
-    private String[] segmentInput(String command) {
-        Objects.requireNonNull(command);
+    private String[] segment(String input) {
+        Objects.requireNonNull(input);
 
-        if (command.isBlank()) {
+        if (input.isBlank()) {
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.EMPTY_COMMAND);
         }
 
-        command = command.trim();
-        return command.split(" ");
-    }
-
-    private String getRegex(String charset) {
-        if (charset.equals(CodeGeneratorConfigurer.Charset.NUMERIC)) {
-            return "[0-9]+";
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_LOWERCASE)) {
-            return "[a-z]+";
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_UPPERCASE)) {
-            return "[A-Z]+";
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET)) {
-            return "[A-Za-z]+";
-        }
-
-        return "[0-9]+";
-    }
-
-    private String createValidatedItemCodeFrom(String[] codeSegment) {
-        String itemCodeRegex = getRegex(itemCodeCharset);
-        int len = 0;
-        int part = codeGeneratorConfigGetter.getItemCodeConfig().getSpace();
-        int partLength = itemCodeLength / part;
-
-        for (String s : codeSegment) {
-            if (!s.matches(itemCodeRegex)) {
-                throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-            }
-
-            int length  = s.length();
-
-            if (length != partLength) {
-                throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-            }
-
-            len += length;
-        }
-
-        if (len != itemCodeLength) {
-            throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
-        }
-
-        return String.join(" ", codeSegment[0], codeSegment[1], codeSegment[2]);
-
+        input = input.trim();
+        return input.split(" ");
     }
 
 }
