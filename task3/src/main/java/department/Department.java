@@ -13,14 +13,16 @@ public class Department {
     private final List<Department> subordinates;
     private Department superior;
     private Department root;
+    private boolean isRoot;
     private boolean visited;
 
     public Department(int headCount, String name, boolean isRoot) {
         this.headCount = headCount;
         this.name = name;
         this.subordinates = new LinkedList<>();
+        this.isRoot = isRoot;
         if (isRoot) {
-            setAsRoot();
+            this.combinedHeadCount = headCount;
         }
     }
 
@@ -33,8 +35,7 @@ public class Department {
     }
 
     public void setAsRoot() {
-        this.superior = this;
-        this.root = this;
+        this.isRoot = true;
     }
 
     public void addSubordinate(Department subordinate) {
@@ -63,6 +64,14 @@ public class Department {
         return subordinates;
     }
 
+    public Department getSuperior() {
+        return superior;
+    }
+
+    public Department getRoot() {
+        return root;
+    }
+
     public void markVisited() {
         this.visited = true;
     }
@@ -83,31 +92,26 @@ public class Department {
     @Override
     public String toString() {
         return "Department{" +
-                "people=" + headCount +
-                ", name='" + name + '\'' +
+                " headCount=" + headCount +
+                ", name=" + name +
                 ", subordinates=" + subordinates +
-                ", superior=" + superior.getName() +
-                ", totalPeopleUpToThis=" + combinedHeadCount +
-                ", visited=" + visited +
-                '}';
+                ", superior=" + superior +
+                ", root =" + this.root +
+                ", totalHeadCount=" + combinedHeadCount +
+                " }";
     }
 
     private Department findRoot() {
 
-        Department root;
-        if (this.root == null) {
-            throw new NoSuchElementException("최상위 부서가 설정되어 있지 않습니다. 최상위 부서를 설정해주세요.");
-        } else if (isThisNotRoot()) {
-            root = findRootOf(this);
-        } else {
-            root = this.root;
+        if (isThisNotRoot()) {
+            return findRootOf(this);
         }
 
-        return root;
+        return this;
     }
 
     private boolean isThisNotRoot() {
-        return this.root != this;
+        return !isRoot;
     }
 
     private boolean alreadyRelatedTo(Department subordinate) {
@@ -126,12 +130,7 @@ public class Department {
         newRoot.combinedHeadCount += subHeadCount;
     }
 
-    private void relateTo(Department subordinate) {
-        this.subordinates.add(subordinate);
-        subordinate.superior = this;
-    }
-
-    private int calculateHeadCountAndSetRoot(Department department, Department root) {
+    private int calculateHeadCountAndSetRoot(Department department, Department newRoot) {
         department.markVisited();
         int count = department.headCount;
 
@@ -139,19 +138,27 @@ public class Department {
 
         for (Department s : subordinates) {
             if (!s.visited) {
-                count += calculateHeadCountAndSetRoot(s, root);
+                count += calculateHeadCountAndSetRoot(s, newRoot);
             }
         }
 
-        department.root = root;
+        department.root = newRoot;
 
         return count;
     }
 
+    private void relateTo(Department subordinate) {
+        this.subordinates.add(subordinate);
+        subordinate.superior = this;
+    }
+
     private Department findRootOf(Department department) {
-        if (department.superior != department) {
+        if (department == null)
+            throw new NoSuchElementException("상위 부서가 설정되어 있지 않습니다");
+
+        if (!department.isRoot)
             department = findRootOf(department.superior);
-        }
+
         return department;
     }
 
