@@ -140,6 +140,13 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
                 .get();
     }
 
+    public Voucher getRandomAvailableVoucher() {
+        return voucherStorage.values().stream()
+                .filter(v -> v.getAuditDate().getExpirationDate().isAfter(LocalDateTime.now()))
+                .findAny()
+                .get();
+    }
+
     public String getRandomCodeFromDifferentShop(String itemCode) {
         Voucher voucher = voucherStorage.get(itemCode);
         String shopCode = voucher.getItem().getShop().getCode();
@@ -157,11 +164,11 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
         Period period = Period.between(start, end);
 
         int days = period.getDays() + 1;
-        int months = period.getMonths() + 1;
+        int months = period.getMonths() + 3;
 
         return start
-                .plusDays(random.nextInt(days))
-                .plusMonths((random.nextInt(months)))
+                .plusDays(random.nextInt(32))
+                .plusMonths((random.nextInt(13)))
                 .atTime(23, 59);
     }
 }
