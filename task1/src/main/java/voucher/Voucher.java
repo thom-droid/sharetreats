@@ -106,59 +106,42 @@ public final class Voucher {
         public String getMessage() {
             return message;
         }
-
-
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void printAvailability() {
-        System.out.println(this);
-    }
-
-    public void printClaimedItem() {
-        System.out.println(toStringWithClaimedItem());
-    }
-
     public String toStringWithClaimedItem() {
         return "상품 [" + this.getItem().getName() + "] 교환을 성공하였습니다.. \n" +
-                "교환 코드 : [ " + this.getCode() + " ] \n " +
-                "교환 상점 : [ " + this.item.getShop().getCode() + " ] \n" +
-                "사용날짜 : [ " + this.getAuditDate().getUsedDate() + " ] ";
+                "교환코드 : [ " + this.getCode() + " ] \n" +
+                "교환상점 : [ " + this.item.getShop().getCode() + " ] \n" +
+                "사용날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getUsedDate()) + " ] ";
     }
 
     public String toStringWithAvailability() {
-        String prefix = "상품 코드 [" + this.getCode() + ", " + this.getItem().getName() + "] 은 ";
-        String formattedExpirationDate = Formatter.convertDateToString(getAuditDate().getExpirationDate());
-
-        if (this.getStatus() == Status.AVAILABLE) {
-            return prefix + formattedExpirationDate +" 까지 사용 가능합니다. ";
-
-        } else if (this.getStatus() == Status.EXPIRED) {
-            return prefix + formattedExpirationDate + " 이후 만료되어 사용하실 수 없습니다.";
-
-        } else if (this.getStatus() == Status.USED) {
-            String formattedUsedDate = Formatter.convertDateToString(getAuditDate().getUsedDate());
-            return prefix + formattedUsedDate + " 에 사용되었습니다.";
-        }
-
-        return "상품 [" + this.getItem().getName() + "]  \n" +
+        String usedDate = "";
+        String message = "상품 [" + this.getItem().getName() + "] 에 대한 정보입니다. \n" +
+                "상태 : [ " + this.getStatus().getMessage() + " ] \n" +
                 "교환코드 : [ " + this.getCode() + " ] \n" +
-                "사용날짜 : [ " + this.getAuditDate().getUsedDate() + " ] ";
+                "상점코드 : [ " + this.getItem().getShop().getCode() + " ] \n" +
+                "발급날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getIssueDate()) + " ] \n" +
+                "만료날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getExpirationDate()) + " ] \n";
+
+        if (this.getAuditDate().getUsedDate() != null) {
+            usedDate = "\n사용날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getUsedDate()) + " ] ";
+        }
+        return message + usedDate;
     }
 
     @Override
     public String toString() {
-        return "상품 교환권 발급 {" +
-                " 상태 = " + status.getMessage() +
-                ", 상품 = " + item.getName() +
-                ", 교환권 코드 = " + code +
-                ", 교환가능한 상점 = " + item.getShop().getCode() +
-                ", 발급일자 = " + voucherDate.getIssueDate() +
-                ", 만료일자 = " + voucherDate.getExpirationDate() +
-                ", 사용날짜 = " + voucherDate.getUsedDate() +
+        return "상품 : [ " + item.getName() +" ], " +
+                "상태 : [ " + status.getMessage() + " ], " +
+                "교환코드 : [ " + code + " ], " +
+                "교환상점 : [ " + item.getShop().getCode() + " ], "  +
+                "발급일자 : [ " + Formatter.convertDateToString(voucherDate.getIssueDate()) + " ], " +
+                "만료일자 : [ " + Formatter.convertDateToString(voucherDate.getExpirationDate()) +" ] " +
                 '}';
     }
 

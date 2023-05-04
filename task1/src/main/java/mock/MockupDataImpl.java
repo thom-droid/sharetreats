@@ -29,6 +29,16 @@ import java.util.*;
 
 public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
 
+    private final static MockupData instance;
+
+    public static MockupData getInstance() {
+        return instance;
+    }
+
+    static {
+        instance = new MockupDataImpl();
+    }
+
     private final Map<String, Voucher> voucherStorage = new HashMap<>();
     private final CodeGenerator itemCodeGenerator;
     private final CodeGenerator shopCodeGenerator;
@@ -43,7 +53,7 @@ public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
         setupStorage();
     }
 
-    public MockupDataImpl() {
+    private MockupDataImpl() {
         this.itemCodeGenerator = CodeGenerator.build();
         this.itemCode = itemCodeGenerator.generate();
         this.shopCodeGenerator = CodeGenerator.build(CodeGeneratorConfigurer.create(6, 4, CodeGeneratorConfigurer.Charset.ALPHABET, 0));

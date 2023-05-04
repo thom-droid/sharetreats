@@ -1,15 +1,31 @@
-package command;
+package command.commands;
 
 import code.CodeGeneratorConfigGetter;
+import command.AbstractCommand;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
+import mock.MockupData;
+import mock.MockupDataImpl;
 import voucher.VoucherService;
+import voucher.VoucherServiceImpl;
 
 import java.util.Arrays;
 
 public class Check extends AbstractCommand {
 
-    public Check(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
+    private static Check instance;
+
+    public static Check getInstance() {
+        if (instance == null) {
+            MockupData mockupData = MockupDataImpl.getInstance();
+            CodeGeneratorConfigGetter codeGeneratorConfigGetter = (CodeGeneratorConfigGetter) mockupData;
+            VoucherService voucherService1 = VoucherServiceImpl.getInstance();
+            instance = new Check(codeGeneratorConfigGetter, voucherService1);
+        }
+        return instance;
+    }
+
+    private Check(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
         super(codeGeneratorConfigGetter, voucherService);
     }
 
@@ -21,7 +37,6 @@ public class Check extends AbstractCommand {
 
     @Override
     public String[] parse(String command) {
-        validateCommandFrom(command);
 
         String[] segments = segment(command);
 

@@ -1,7 +1,11 @@
-package command;
+package command.commands;
 
 import code.CodeGeneratorConfigGetter;
+import command.AbstractCommand;
+import mock.MockupData;
+import mock.MockupDataImpl;
 import voucher.VoucherService;
+import voucher.VoucherServiceImpl;
 
 public class Help extends AbstractCommand {
 
@@ -18,18 +22,30 @@ public class Help extends AbstractCommand {
                     "위의 조건이 맞지 않는 문자열이 입력된 경우 예외가 발생하며 프로그램이 종료됩니다. " +
                     "\n===========================================================================================\n";
 
-    public Help(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
+    private static final Help instance;
+
+    public static Help getInstance() {
+        return instance;
+    }
+
+    static {
+        MockupData mockupData = MockupDataImpl.getInstance();
+        CodeGeneratorConfigGetter codeGeneratorConfigGetter1 = (CodeGeneratorConfigGetter) mockupData;
+        VoucherService voucherService1 = VoucherServiceImpl.getInstance();
+        instance = new Help(codeGeneratorConfigGetter1, voucherService1);
+    }
+
+    private Help(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
         super(codeGeneratorConfigGetter, voucherService);
     }
 
     @Override
     public String process(String command) {
-        return voucherService.help();
+        return MESSAGE;
     }
 
     @Override
     public String[] parse(String command) {
-        validateCommandFrom(command);
         return null;
     }
 }

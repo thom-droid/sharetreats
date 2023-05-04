@@ -1,15 +1,32 @@
-package command;
+package command.commands;
 
 import code.CodeGeneratorConfigGetter;
+import command.AbstractCommand;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
+import mock.MockupData;
+import mock.MockupDataImpl;
 import voucher.VoucherService;
+import voucher.VoucherServiceImpl;
 
 import java.util.Arrays;
 
 public class Claim extends AbstractCommand {
 
-    public Claim(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
+    private static final Claim instance;
+
+    static {
+        MockupData mockupData = MockupDataImpl.getInstance();
+        CodeGeneratorConfigGetter codeGeneratorConfigGetter1 = (CodeGeneratorConfigGetter) mockupData;
+        VoucherService voucherService1 = VoucherServiceImpl.getInstance();
+        instance = new Claim(codeGeneratorConfigGetter1, voucherService1);
+    }
+
+    public static Claim getInstance() {
+        return instance;
+    }
+
+    private Claim(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
         super(codeGeneratorConfigGetter, voucherService);
     }
 
@@ -23,7 +40,6 @@ public class Claim extends AbstractCommand {
 
     @Override
     public String[] parse(String command) {
-        validateCommandFrom(command);
 
         String[] segments = segment(command);
 

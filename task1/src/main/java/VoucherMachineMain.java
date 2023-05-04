@@ -1,12 +1,5 @@
-import code.CodeGeneratorConfigGetter;
-import command.CommandEnum;
-import command.Help;
-import mock.MockupData;
-import mock.MockupDataImpl;
-import command.CommandController;
-import voucher.VoucherRepositoryImpl;
-import voucher.VoucherService;
-import voucher.VoucherServiceImpl;
+import command.*;
+import command.commands.Help;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,10 +9,10 @@ public class VoucherMachineMain {
 
     public static void main(String[] args) throws IOException {
 
-        MockupData mockupData = new MockupDataImpl();
-        CodeGeneratorConfigGetter codeGeneratorConfigGetter = (CodeGeneratorConfigGetter) mockupData;
-        VoucherService voucherService = new VoucherServiceImpl(new VoucherRepositoryImpl(mockupData));
-        CommandController commandController;
+        CommandFactory commandFactory = new CommandFactoryImpl(CommandEnum.class);
+        CommandEnumWrapperFactory commandProcessorFactory = new CommandEnumWrapperFactory(commandFactory);
+        CommandEnumWrapper commandProcessor = commandProcessorFactory.createCommandProcessor();
+        CommandController commandController = new CommandController(commandProcessor);
 
         boolean runtime = true;
         System.out.println(Help.MESSAGE);
@@ -29,16 +22,14 @@ public class VoucherMachineMain {
             String line = br.readLine();
             System.out.println("입력된 커맨드 : " + line);
 
-            String result = commandController.validateCommand(line);
+            String result = commandController.process(line);
 
-            if (result.equals(CommandEnum.EXIT.getDesc())) {
+            if (result.equals("EXIT")) {
                 System.out.println("프로그램을 종료합니다.");
                 break;
-            } else if (result.equals(CommandEnum.HELP.getDesc())) {
-                System.out.println(Help.MESSAGE);
-            } else {
-                System.out.println(result);
             }
+
+            System.out.println(result);
         }
     }
 }

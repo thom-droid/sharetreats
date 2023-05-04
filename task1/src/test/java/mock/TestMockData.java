@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
 
+import static voucher.Voucher.Status.USED;
+
 /** 테스트에 맞게 데이터를 가공하기 위해 만든 클래스입니다. 실제 런타임 시 사용되는 클래스는 {@link MockupDataImpl} 입니다.
  * 해당 타입의 인스턴스가 생성될 때 상품 교환권({@link Voucher})이 20장 발급되어 {@code voucherStorage}에 저장됩니다.
  * 상품 코드의 길이, 문자열타입 등의 설정은 클래스의 생성자 파라미터 값인 {@link CodeGeneratorConfigurer}의 설정을 통해 가능합니다. */
@@ -42,6 +44,7 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
     }
 
     private void setupStorage() {
+        System.out.println("USING TEST MOCK DB");
         List<Voucher> vouchers = populateVoucher();
 
         for (Voucher voucher : vouchers) {
@@ -135,8 +138,9 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
 
     public Voucher getRandomExpiredVoucher() {
         return voucherStorage.values().stream()
+                .filter(v -> v.getStatus() != USED
+                        && v.getAuditDate().getExpirationDate().isBefore(LocalDateTime.of(2023, 1, 31, 0, 0)))
                 .findAny()
-                .map(v -> Voucher.of(v.getId(), v.getItem(), v.getCode(), v.getAuditDate(), Voucher.Status.EXPIRED))
                 .get();
     }
 

@@ -2,16 +2,23 @@ package voucher;
 
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
+import mock.CommandTestUtils;
 import mock.TestMockData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public class VoucherServiceImplTest {
 
-    private final TestMockData mockData = new TestMockData();
-    private final VoucherServiceImpl voucherService = new VoucherServiceImpl(new VoucherRepositoryImpl(mockData));
+    private TestMockData mockData;
+    private VoucherService voucherService;
+
+    @BeforeEach
+    public void setup() {
+        mockData = (TestMockData) CommandTestUtils.MockCommandInitiator.getMockupData();
+        voucherService = CommandTestUtils.MockCommandInitiator.getVoucherService();
+    }
 
     @Test
     void givenNull_thenThrowsNullPointerException() {
@@ -51,7 +58,7 @@ public class VoucherServiceImplTest {
 
         //then
         Throwable throwable = assertThrows(CustomRuntimeException.class, () -> voucherService.claim(shopCode, expiredCode));
-        assertEquals(throwable.getMessage(), CustomRuntimeExceptionCode.EXPIRED_CODE.getMessage());
+        assertEquals(CustomRuntimeExceptionCode.EXPIRED_CODE.getMessage(), throwable.getMessage());
 
     }
 
@@ -69,7 +76,7 @@ public class VoucherServiceImplTest {
 
         //then
         Throwable throwable = assertThrows(CustomRuntimeException.class, () -> voucherService.claim(shopCode, usedCode));
-        assertEquals(throwable.getMessage(), CustomRuntimeExceptionCode.ALREADY_USED_CODE.getMessage());
+        assertEquals(CustomRuntimeExceptionCode.ALREADY_USED_CODE.getMessage(), throwable.getMessage());
 
     }
 
@@ -83,7 +90,7 @@ public class VoucherServiceImplTest {
 
         //then
         Throwable throwable = assertThrows(CustomRuntimeException.class, () -> voucherService.claim(differentShopCode, itemCode));
-        assertEquals(throwable.getMessage(), CustomRuntimeExceptionCode.SHOPCODE_NOT_MATCHED.getMessage());
+        assertEquals(CustomRuntimeExceptionCode.SHOPCODE_NOT_MATCHED.getMessage(), throwable.getMessage());
 
     }
 

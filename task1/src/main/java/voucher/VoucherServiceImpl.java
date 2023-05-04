@@ -2,6 +2,7 @@ package voucher;
 
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
+import mock.MockupData;
 
 import java.util.Objects;
 
@@ -35,11 +36,33 @@ import java.util.Objects;
 
 public class VoucherServiceImpl implements VoucherService {
 
-    private final VoucherRepository voucherRepository;
+    private static VoucherService instance;
 
-    public VoucherServiceImpl(VoucherRepository voucherRepository) {
+    public static VoucherService getInstance() {
+        if (instance == null) {
+            VoucherRepository vr = VoucherRepositoryImpl.getInstance();
+            instance = new VoucherServiceImpl(vr);
+        }
+        return instance;
+    }
+
+    public static VoucherService getInstance(MockupData mockupData) {
+        if (instance == null) {
+            VoucherRepository vr = VoucherRepositoryImpl.getInstance(mockupData);
+            instance = new VoucherServiceImpl(vr);
+        }
+        return instance;
+    }
+
+    private VoucherServiceImpl(VoucherRepository voucherRepository) {
         this.voucherRepository = voucherRepository;
     }
+
+    private final VoucherRepository voucherRepository;
+
+//    public VoucherServiceImpl(VoucherRepository voucherRepository) {
+//        this.voucherRepository = voucherRepository;
+//    }
 
     /**
      * <p>

@@ -1,12 +1,9 @@
 package command;
 
-import code.CodeGeneratorConfigurer;
-import code.CodeGeneratorConfigGetter;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
 import voucher.VoucherService;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /** <p> 요청받은 입력값을 검증하고 검증에 성공하면 {@link VoucherService}에 요청을 전달합니다.
@@ -15,18 +12,19 @@ import java.util.Objects;
  * */
 public class CommandController {
 
-    public String validateCommand(String input) {
+    private final CommandEnumWrapper commandEnumWrapper;
+
+    public CommandController(CommandEnumWrapper commandEnumWrapper) {
+        this.commandEnumWrapper = commandEnumWrapper;
+    }
+
+    public String process(String input) {
 
         String[] segments = segment(input);
         String commandSegment = segments[0].toUpperCase();
 
-        CommandEnum command = Arrays.stream(CommandEnum.values())
-                .filter(c -> c.equals(CommandEnum.valueOf(commandSegment)))
-                .findFirst()
-                .orElseThrow(() -> new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MISTYPED_COMMAND));
-
+        Command command = commandEnumWrapper.findCommand(commandSegment);
         return command.process(input);
-
     }
 
     private String[] segment(String input) {

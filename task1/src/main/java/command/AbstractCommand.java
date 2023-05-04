@@ -6,10 +6,9 @@ import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
 import voucher.VoucherService;
 
-import java.util.Arrays;
 import java.util.Objects;
 
-abstract class AbstractCommand implements Command {
+public abstract class AbstractCommand implements Command {
 
     protected final int itemCodeLength;
     protected final int shopCodeLength;
@@ -27,20 +26,7 @@ abstract class AbstractCommand implements Command {
         this.voucherService = voucherService;
     }
 
-    abstract String[] parse(String command);
-
-    protected void validateCommandFrom(String command) {
-
-        String[] segments = segment(command);
-        String commandSegment = segments[0].toUpperCase();
-
-        boolean doesNotMatchAny = Arrays.stream(CommandEnum.values())
-                .noneMatch(c -> commandSegment.equals(c.getDesc()));
-
-        if (doesNotMatchAny) {
-            throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MISTYPED_COMMAND);
-        }
-    }
+    protected abstract String[] parse(String command);
 
     protected String[] segment(String input) {
         Objects.requireNonNull(input);

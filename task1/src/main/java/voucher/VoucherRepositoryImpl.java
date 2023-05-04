@@ -1,6 +1,7 @@
 package voucher;
 
 import mock.MockupData;
+import mock.MockupDataImpl;
 
 import java.util.*;
 
@@ -8,11 +9,28 @@ import java.util.*;
 
 public class VoucherRepositoryImpl implements VoucherRepository {
 
-    private final MockupData mockDb;
+    private static VoucherRepository instance;
 
-    public VoucherRepositoryImpl(MockupData mockDb) {
+    public static VoucherRepository getInstance() {
+        if (instance == null) {
+            MockupData mockupData = MockupDataImpl.getInstance();
+            instance = new VoucherRepositoryImpl(mockupData);
+        }
+        return instance;
+    }
+
+    public static VoucherRepository getInstance(MockupData mockupData) {
+        if (instance == null) {
+            instance = new VoucherRepositoryImpl(mockupData);
+        }
+        return instance;
+    }
+
+    private VoucherRepositoryImpl(MockupData mockDb) {
         this.mockDb = mockDb;
     }
+
+    private final MockupData mockDb;
 
     @Override
     public Optional<Voucher> findByCode(String code) {
