@@ -2,8 +2,8 @@ package voucher;
 
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
-import mock.CommandTestUtils;
-import mock.TestMockData;
+import test_util.CommandTestUtils;
+import test_util.TestMockData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

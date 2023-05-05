@@ -1,4 +1,4 @@
-package mock;
+package test_util;
 
 import code.CodeGeneratorConfigGetter;
 import command.*;
@@ -8,6 +8,7 @@ import command.commands.Exit;
 import command.commands.Help;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
+import mock.MockupData;
 import voucher.VoucherService;
 import voucher.VoucherServiceImpl;
 

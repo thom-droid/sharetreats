@@ -1,8 +1,10 @@
-package mock;
+package test_util;
 
 import code.CodeGenerator;
 import code.CodeGeneratorConfigurer;
 import code.CodeGeneratorConfigGetter;
+import mock.MockupData;
+import mock.MockupDataImpl;
 import shop.Item;
 import shop.Shop;
 import voucher.Voucher;
