@@ -1,11 +1,6 @@
-package mock;
+package department;
 
-import department.Department;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class DepartmentRepositoryImpl implements DepartmentRepository {
 
@@ -17,18 +12,24 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    public void save(Department department) {
-
+    public Department save(Department department) {
+        put(department);
+        return department;
     }
 
     @Override
     public List<Department> findAll() {
-        return null;
+        return new ArrayList<>(storage.values());
     }
 
     @Override
     public Optional<Department> findOneByName(String name) {
-        return null;
+        return Optional.ofNullable(storage.get(name));
+    }
+
+    @Override
+    public void delete(Department department) {
+        storage.remove(department.getName());
     }
 
     private void setup() {
@@ -40,5 +41,14 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
         dev.addSubordinate(backend);
         dev.addSubordinate(frontend);
         dev.addSubordinate(devops);
+
+        put(dev);
+        put(backend);
+        put(frontend);
+        put(devops);
+    }
+
+    private void put(Department department) {
+        storage.put(department.getName(), department);
     }
 }

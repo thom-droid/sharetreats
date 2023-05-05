@@ -6,11 +6,10 @@ public interface DepartmentService {
 
     Department getDepartment(String name);
 
-    Department getTotalDepartment(String departmentName);
-
     List<Department> getAllDepartments();
 
-    Department saveDepartment(Department department);
+    String post(Department department);
 
+    void delete(Department department);
 
 }

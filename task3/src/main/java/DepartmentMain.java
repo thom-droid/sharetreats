@@ -1,6 +1,5 @@
-import department.Department;
-import mock.DepartmentRepository;
-import mock.DepartmentRepositoryImpl;
+import department.DepartmentRepository;
+import department.DepartmentRepositoryImpl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
