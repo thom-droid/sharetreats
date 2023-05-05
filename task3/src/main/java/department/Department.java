@@ -1,11 +1,15 @@
 package department;
 
+import exception.CustomRuntimeException;
+import exception.CustomRuntimeExceptionCode;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class Department {
+
+    private static final String REGEX = "[A-Z]+";
 
     private final int headCount;
     private Integer combinedHeadCount;
@@ -27,10 +31,12 @@ public class Department {
     }
 
     public static Department of(int headCount, String name) {
+        validate(headCount, name);
         return new Department(headCount, name, false);
     }
 
     public static Department of(int headCount, String name, boolean isRoot) {
+        validate(headCount, name);
         return new Department(headCount, name, isRoot);
     }
 
@@ -41,6 +47,10 @@ public class Department {
     public void addSubordinate(Department subordinate) {
         if (subordinate == null) {
             return;
+        }
+
+        if (subordinate.isThisRoot()) {
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_SUBORDINATED);
         }
 
         if (alreadyRelatedTo(subordinate)) {
@@ -76,6 +86,23 @@ public class Department {
         this.visited = true;
     }
 
+    public int getTotalHeadCountOfDepartment() {
+        if (isThisRoot()) {
+            return this.combinedHeadCount;
+        } else if (this.root == null) {
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NO_ROOT_IS_SET);
+        }
+        return this.root.getCombinedHeadCount();
+    }
+
+    public boolean isThisRoot() {
+        return isRoot;
+    }
+
+    public void throwDuplicatedNameException(){
+        throw new CustomRuntimeException(CustomRuntimeExceptionCode.DUPLICATED_NAME);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -103,15 +130,11 @@ public class Department {
 
     private Department findRoot() {
 
-        if (isThisNotRoot()) {
+        if (!isThisRoot()) {
             return findRootOf(this);
         }
 
         return this;
-    }
-
-    private boolean isThisNotRoot() {
-        return !isRoot;
     }
 
     private boolean alreadyRelatedTo(Department subordinate) {
@@ -122,7 +145,6 @@ public class Department {
         Department oldRoot = subordinate.root;
         int subHeadCount = calculateHeadCountAndSetRoot(subordinate, newRoot);
 
-        // 기존에 연결된 최상위 부서의 캐시에서 이동된 부서 인원만큼 차감
         if (oldRoot != null) {
             oldRoot.combinedHeadCount -= subHeadCount;
         }
@@ -154,12 +176,27 @@ public class Department {
 
     private Department findRootOf(Department department) {
         if (department == null)
-            throw new NoSuchElementException("상위 부서가 설정되어 있지 않습니다");
-
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NO_SUPERIOR_IS_SET);
         if (!department.isRoot)
             department = findRootOf(department.superior);
 
         return department;
     }
+
+    private static void validate(int headCount, String departmentName) {
+        validate(departmentName);
+        validate(headCount);
+    }
+
+    private static void validate(String departmentName) {
+        if (!departmentName.matches(REGEX))
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_NAME);
+    }
+
+    private static void validate(int headCount) {
+        if (headCount <= 0 || headCount > 1000)
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT);
+    }
+
 
 }
