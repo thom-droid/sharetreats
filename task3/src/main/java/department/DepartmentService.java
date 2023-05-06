@@ -4,14 +4,16 @@ import java.util.List;
 
 public interface DepartmentService {
 
-    Department getDepartment(String name);
+    String getDepartment(String name);
 
     List<Department> getAllDepartments();
 
     String post(Department department);
 
-    void delete(Department department);
+    void delete(String departmentName);
 
-    void update(String departmentName, int headCount);
+    void update(String departmentName, int headcount);
+
+    String relate(String superior, String subordinate);
 
 }

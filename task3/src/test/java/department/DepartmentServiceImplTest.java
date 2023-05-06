@@ -37,8 +37,49 @@ public class DepartmentServiceImplTest {
         Throwable t = assertThrows(
                 CustomRuntimeException.class, () -> departmentService.getDepartment(removedName));
         assertEquals(CustomRuntimeExceptionCode.NO_SUCH_DEPARTMENT.getMessage(), t.getMessage());
-        //Todo department which field should be final? if there is new employee,
         //Todo when removed, cache must be updated too
+    }
+
+    @Test
+    void givenRootDepartment_whenDelete_thenThrows() {
+
+        //given
+        String randomRootName = departmentRepository.getRandomRootDepartment();
+
+        //when and then
+        Throwable t = assertThrows(CustomRuntimeException.class, () -> departmentService.delete(randomRootName));
+        assertEquals(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_DELETE.getMessage(), t.getMessage());
+
+    }
+
+    @Test
+    void givenTwoExistingDepartments_whenRelatedWithRootSet_thenSucceed() {
+
+        //given
+        Department root = departmentRepository.save(Department.of(5, "TESTROOT", true));
+        Department superior = departmentRepository.save(Department.of(10, "SUP"));
+        Department subordinate = departmentRepository.save(Department.of(5, "SUB"));
+        root.addSubordinate(superior);
+
+        //when
+        String result = assertDoesNotThrow(() -> departmentService.relate(superior.getName(), subordinate.getName()));
+
+        System.out.println(result);
+    }
+
+    @Test
+    void givenTwoExistingDepartments_whenRelatedWithoutRoot_thenThrows() {
+
+        //given
+        Department superior = departmentRepository.save(Department.of(10, "SUP"));
+        Department subordinate = departmentRepository.save(Department.of(5, "SUB"));
+
+        //when
+        Throwable t = assertThrows(
+                CustomRuntimeException.class, () -> departmentService.relate(superior.getName(), subordinate.getName())
+        );
+
+        assertEquals(CustomRuntimeExceptionCode.NO_SUPERIOR_IS_SET.getMessage(), t.getMessage());
     }
 
 }

@@ -23,7 +23,7 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
     }
 
     @Override
-    public Optional<Department> findOneByName(String name) {
+    public Optional<Department> findBy(String name) {
         return Optional.ofNullable(storage.get(name));
     }
 

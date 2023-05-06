@@ -14,11 +14,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public Department getDepartment(String name) {
-        return departmentRepository.findOneByName(name)
-                .orElseThrow(
-                        () -> new CustomRuntimeException(CustomRuntimeExceptionCode.NO_SUCH_DEPARTMENT)
-                );
+    public String getDepartment(String name) {
+        Department d = findBy(name);
+
+        return d.relationToString();
     }
 
     @Override
@@ -29,21 +28,36 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public String post(Department department) {
         String name = department.getName();
-        departmentRepository.findOneByName(name).ifPresent(Department::throwDuplicatedNameException);
+        departmentRepository.findBy(name).ifPresent(Department::throwDuplicatedNameException);
 
         return departmentRepository.save(department).getName();
     }
 
     @Override
-    public void delete(Department department) {
-        Department d = getDepartment(department.getName());
+    public void delete(String departmentName) {
+        Department d = findBy(departmentName);
         if (d.isThisRoot()) throw new CustomRuntimeException(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_DELETE);
     }
 
     @Override
-    public void update(String departmentName, int headCount) {
-        Department d = getDepartment(departmentName);
+    public void update(String departmentName, int headcount) {
+        Department d = findBy(departmentName);
+        d.updateCache(headcount);
+    }
 
+    @Override
+    public String relate(String superior, String subordinate) {
+        Department sup = findBy(superior);
+        Department sub = findBy(subordinate);
 
+        sup.addSubordinate(sub);
+        return sub.relationToString();
+    }
+
+    private Department findBy(String name) {
+        return departmentRepository.findBy(name)
+                .orElseThrow(
+                        () -> new CustomRuntimeException(CustomRuntimeExceptionCode.NO_SUCH_DEPARTMENT)
+                );
     }
 }

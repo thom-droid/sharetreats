@@ -1,5 +1,7 @@
 package department;
 
+import exception.CustomRuntimeException;
+import exception.CustomRuntimeExceptionCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -101,64 +103,65 @@ public class DepartmentTest {
 
     @Test
     public void givenNewDepartment_whenNameIsNotUppercaseAlphabet_thenThrows() {
-
-        assertThrows(IllegalArgumentException.class, () -> Department.of(15, "abC"));
-
+        Throwable t = assertThrows(CustomRuntimeException.class, () -> Department.of(15, "abC"));
+        assertEquals(CustomRuntimeExceptionCode.NOT_VALID_NAME.getMessage(), t.getMessage());
     }
 
     @Test
     public void givenNewDepartment_whenHeadCountIsNotBetween1And1000_thenThrows() {
-        assertThrows(IllegalArgumentException.class, () -> Department.of(0, "DEV"));
+        Throwable t = assertThrows(CustomRuntimeException.class, () -> Department.of(-15, "DEV"));
+        assertEquals(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT.getMessage(), t.getMessage());
+        Throwable t2 = assertThrows(CustomRuntimeException.class, () -> Department.of(1010, "DEV"));
+        assertEquals(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT.getMessage(), t2.getMessage());
     }
 
     @Test
     public void givenNewDepartment_whenTryingToSubordinateRoot_thenThrows() {
-
         Department e = Department.of(10, "E");
-        assertThrows(IllegalArgumentException.class, () -> e.addSubordinate(root));
-
+        Throwable t = assertThrows(CustomRuntimeException.class, () -> e.addSubordinate(root));
+        assertEquals(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_SUBORDINATED.getMessage(), t.getMessage());
     }
 
     @Test
-    public void givenNewHeadCount_thenUpdateCombinedHeadCountOfDepartment() {
+    void givenDepartmentAndNewHeadCount_whenUpdateCache_thenSucceed() {
 
         //given
-        int newHeadCount1 = 10;
+        int headCount = 10;
         int expected1 = 24;
 
-        // root headcount : 1 -> 10. combined headcount will increase from 15 to 24.
-        root.updateHeadCount(newHeadCount1);
+        //when
+        // a has 1, updating to 10, so combined headcount will be 15 + 10 - 1 = 24
+        root.updateCache(headCount);
+
+        List<Integer> results1 = List.of(
+                a.getTotalHeadCountOfDepartment(),
+                b.getTotalHeadCountOfDepartment(),
+                c.getTotalHeadCountOfDepartment(),
+                d.getTotalHeadCountOfDepartment()
+        );
 
         //then
-        List<Integer> results = List.of(
-                root.getTotalHeadCountOfDepartment(),
-                a.getTotalHeadCountOfDepartment(),
-                b.getTotalHeadCountOfDepartment(),
-                c.getTotalHeadCountOfDepartment(),
-                d.getTotalHeadCountOfDepartment()
-        );
-
-        for (Integer result1 : results) {
-            assertEquals(expected1, result1);
+        for (Integer result : results1) {
+            assertEquals(expected1, result);
         }
 
-        int newHeadCount2 = 10;
+        //given
         int expected2 = 30;
 
-        c.updateHeadCount(newHeadCount2);
+        //when
+        // c has 4 headcount, updating by 10 will result in the increment of 6 in total. 24 + 10 - 4 = 30
+        c.updateCache(headCount);
 
         List<Integer> results2 = List.of(
-                root.getTotalHeadCountOfDepartment(),
                 a.getTotalHeadCountOfDepartment(),
                 b.getTotalHeadCountOfDepartment(),
                 c.getTotalHeadCountOfDepartment(),
                 d.getTotalHeadCountOfDepartment()
         );
 
+        //then
         for (Integer result2 : results2) {
             assertEquals(expected2, result2);
         }
-
     }
-
 }
