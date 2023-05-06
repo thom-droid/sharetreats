@@ -119,4 +119,46 @@ public class DepartmentTest {
 
     }
 
+    @Test
+    public void givenNewHeadCount_thenUpdateCombinedHeadCountOfDepartment() {
+
+        //given
+        int newHeadCount1 = 10;
+        int expected1 = 24;
+
+        // root headcount : 1 -> 10. combined headcount will increase from 15 to 24.
+        root.updateHeadCount(newHeadCount1);
+
+        //then
+        List<Integer> results = List.of(
+                root.getTotalHeadCountOfDepartment(),
+                a.getTotalHeadCountOfDepartment(),
+                b.getTotalHeadCountOfDepartment(),
+                c.getTotalHeadCountOfDepartment(),
+                d.getTotalHeadCountOfDepartment()
+        );
+
+        for (Integer result1 : results) {
+            assertEquals(expected1, result1);
+        }
+
+        int newHeadCount2 = 10;
+        int expected2 = 30;
+
+        c.updateHeadCount(newHeadCount2);
+
+        List<Integer> results2 = List.of(
+                root.getTotalHeadCountOfDepartment(),
+                a.getTotalHeadCountOfDepartment(),
+                b.getTotalHeadCountOfDepartment(),
+                c.getTotalHeadCountOfDepartment(),
+                d.getTotalHeadCountOfDepartment()
+        );
+
+        for (Integer result2 : results2) {
+            assertEquals(expected2, result2);
+        }
+
+    }
+
 }

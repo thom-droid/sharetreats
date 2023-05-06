@@ -12,4 +12,6 @@ public interface DepartmentService {
 
     void delete(Department department);
 
+    void update(String departmentName, int headCount);
+
 }

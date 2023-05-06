@@ -11,7 +11,7 @@ public class Department {
 
     private static final String REGEX = "[A-Z]+";
 
-    private final int headCount;
+    private int headCount;
     private Integer combinedHeadCount;
     private final String name;
     private final List<Department> subordinates;
@@ -60,6 +60,13 @@ public class Department {
         Department root = findRoot();
         updateSubordinatesAndCache(subordinate, root);
         relateTo(subordinate);
+    }
+
+    public void updateHeadCount(int headCount) {
+        Department root = findRoot();
+        int tmp = this.headCount;
+        this.headCount = headCount;
+        root.combinedHeadCount += headCount - tmp;
     }
 
     public Integer getCombinedHeadCount() {

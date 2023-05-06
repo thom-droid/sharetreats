@@ -39,4 +39,11 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department d = getDepartment(department.getName());
         if (d.isThisRoot()) throw new CustomRuntimeException(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_DELETE);
     }
+
+    @Override
+    public void update(String departmentName, int headCount) {
+        Department d = getDepartment(departmentName);
+
+
+    }
 }
