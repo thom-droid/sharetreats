@@ -11,14 +11,13 @@ public class Department {
 
     private static final String REGEX = "[A-Z]+";
 
-    private final int headCount;
+    private int headCount;
     private Integer combinedHeadCount;
     private final String name;
     private final List<Department> subordinates;
     private Department superior;
     private Department root;
     private boolean isRoot;
-    private boolean visited;
 
     public Department(int headCount, String name, boolean isRoot) {
         this.headCount = headCount;
@@ -82,25 +81,34 @@ public class Department {
         return root;
     }
 
-    public void markVisited() {
-        this.visited = true;
+    public void updateCache(int headCount) {
+        int tmp = this.headCount;
+        this.headCount = headCount;
+        Department root = findRoot();
+        root.combinedHeadCount += headCount - tmp;
     }
 
     public int getTotalHeadCountOfDepartment() {
-        if (isThisRoot()) {
-            return this.combinedHeadCount;
-        } else if (this.root == null) {
-            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NO_ROOT_IS_SET);
-        }
-        return this.root.getCombinedHeadCount();
+        return findRoot().combinedHeadCount;
     }
 
     public boolean isThisRoot() {
         return isRoot;
     }
 
-    public void throwDuplicatedNameException(){
+    public void throwDuplicatedNameException() {
         throw new CustomRuntimeException(CustomRuntimeExceptionCode.DUPLICATED_NAME);
+    }
+
+    public String relationToString() {
+        String root = this.root == null? "최상위 부서가 설정되어 있지 않습니다." : this.root.getName();
+        String count = this.root == null ?
+                "최상위 부서가 설정되어 있지 않아 현재 부서의 인원만 출력됩니다. " + this.headCount
+                : ""+ this.root.combinedHeadCount;
+
+        return "현재부서: " + this.getName() + " ] \n" +
+                "최상위부서: " + root + ", " +
+                "총 인원: " + count;
     }
 
     @Override
@@ -114,18 +122,6 @@ public class Department {
     @Override
     public int hashCode() {
         return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return "Department{" +
-                " headCount=" + headCount +
-                ", name=" + name +
-                ", subordinates=" + subordinates +
-                ", superior=" + superior +
-                ", root =" + this.root +
-                ", totalHeadCount=" + combinedHeadCount +
-                " }";
     }
 
     private Department findRoot() {
@@ -152,16 +148,15 @@ public class Department {
         newRoot.combinedHeadCount += subHeadCount;
     }
 
+    //Todo cache needs to be stored to each department, not just in root.
+
     private int calculateHeadCountAndSetRoot(Department department, Department newRoot) {
-        department.markVisited();
         int count = department.headCount;
 
         List<Department> subordinates = department.getSubordinates();
 
         for (Department s : subordinates) {
-            if (!s.visited) {
-                count += calculateHeadCountAndSetRoot(s, newRoot);
-            }
+            count += calculateHeadCountAndSetRoot(s, newRoot);
         }
 
         department.root = newRoot;

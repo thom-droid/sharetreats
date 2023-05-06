@@ -26,7 +26,7 @@ public class DepartmentRepositoryTestImpl implements DepartmentRepository {
     }
 
     @Override
-    public Optional<Department> findOneByName(String name) {
+    public Optional<Department> findBy(String name) {
         return Optional.ofNullable(storage.get(name));
     }
 
@@ -63,6 +63,14 @@ public class DepartmentRepositoryTestImpl implements DepartmentRepository {
         String randomName = getRandomName();
         storage.remove(randomName);
         return randomName;
+    }
+
+    public String getRandomRootDepartment() {
+        return storage.values().stream()
+                .filter(Department::isThisRoot)
+                .findAny()
+                .orElse(Department.of(15, "RANDOMROOTZZ", true))
+                .getName();
     }
 
 }
