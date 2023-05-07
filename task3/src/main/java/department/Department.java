@@ -88,6 +88,14 @@ public class Department {
         return root;
     }
 
+    public int getHeadCount() {
+        return headCount;
+    }
+
+    public void setCombinedHeadCount(Integer combinedHeadCount) {
+        this.combinedHeadCount = combinedHeadCount;
+    }
+
     public void updateCache(int headCount) {
         int tmp = this.headCount;
         this.headCount = headCount;
@@ -149,24 +157,48 @@ public class Department {
         int subHeadCount = calculateHeadCountAndSetRoot(subordinate, newRoot);
 
         if (oldRoot != null) {
-            oldRoot.combinedHeadCount -= subHeadCount;
+
         }
 
         newRoot.combinedHeadCount += subHeadCount;
     }
 
-    //Todo cache needs to be stored to each department, not just in root.
+    private void remove(Department subordinate) {
+
+        if (this.getSubordinates().remove(subordinate)) {
+            updateCache(this);
+        }
+
+        updateCache(this);
+
+    }
+
+    private void updateCache(Department department) {
+        int count = department.headCount;
+
+        for (Department subordinate : subordinates) {
+            count += subordinate.getCombinedHeadCount();
+        }
+
+        combinedHeadCount = count;
+
+        Department sup = department.superior;
+        if(sup != null) updateCache(sup);
+
+    }
 
     private int calculateHeadCountAndSetRoot(Department department, Department newRoot) {
         int count = department.headCount;
 
+        if (department.combinedHeadCount != null) return department.combinedHeadCount;
+
         List<Department> subordinates = department.getSubordinates();
 
-        for (Department s : subordinates) {
-            count += calculateHeadCountAndSetRoot(s, newRoot);
-        }
+        for (Department s : subordinates) count += calculateHeadCountAndSetRoot(s, newRoot);
 
-        department.root = newRoot;
+        department.combinedHeadCount = count;
+
+        if(newRoot != null) department.root = newRoot;
 
         return count;
     }

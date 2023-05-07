@@ -164,4 +164,32 @@ public class DepartmentTest {
             assertEquals(expected2, result2);
         }
     }
+
+    @Test
+    void departmentCacheUpdateTest() {
+
+        calculateHeadcount(root);
+        calculateHeadcount(a);
+        calculateHeadcount(b);
+        calculateHeadcount(c);
+        calculateHeadcount(d);
+    }
+
+    public static int calculateHeadcount(Department department) {
+        int headcount = department.getHeadCount();
+
+        if (department.getCombinedHeadCount() != null) {
+            return department.getCombinedHeadCount();
+        }
+
+        List<Department> subs = department.getSubordinates();
+
+        for (Department sub : subs) {
+            headcount += calculateHeadcount(sub);
+        }
+
+        department.setCombinedHeadCount(headcount);
+
+        return headcount;
+    }
 }
