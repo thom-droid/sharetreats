@@ -23,10 +23,10 @@ public class DepartmentTest {
 
     @BeforeEach
     void setup() {
-        root.addSubordinate(a);
-        root.addSubordinate(d);
-        a.addSubordinate(b);
-        b.addSubordinate(c);
+        root.add(a);
+        root.add(d);
+        a.add(b);
+        b.add(c);
     }
 
     @Test
@@ -71,16 +71,18 @@ public class DepartmentTest {
 
         Department newRoot = Department.of(10, "NEWROOT", true);
         Department e = Department.of(6, "E");
+        Department f = Department.of(7, "F");
 
-        // new hierarchy with headcount 10 + 6 = 16
-        newRoot.addSubordinate(e);
+        // newRoot, e,f 로 구성된 새로운 부서 조직, 10 + 6(e) + 7(f) = 23 명
+        newRoot.add(e);
+        e.add(f);
 
         // when
-        // relocate E from newRoot
-        root.addSubordinate(e);
+        // 7명인 f를 root 부서로 이동
+        root.add(f);
 
-        // headcount in root and E. 15 + E = 21
-        int expected = 21;
+        // 7명이 추가되므로 root의 총원은 22명
+        int expectedHeadCountOfRoot = 22;
 
         List<Integer> results = List.of(
                 root.getTotalHeadCountOfDepartment(),
@@ -88,17 +90,17 @@ public class DepartmentTest {
                 b.getTotalHeadCountOfDepartment(),
                 c.getTotalHeadCountOfDepartment(),
                 d.getTotalHeadCountOfDepartment(),
-                e.getTotalHeadCountOfDepartment()
+                f.getTotalHeadCountOfDepartment()
         );
 
         for (Integer result : results) {
-            assertEquals(expected, result);
+            assertEquals(expectedHeadCountOfRoot, result);
         }
 
-        // headCount in newRoot 16 - E = 10
-        int expected2 = 10;
+        // 7명이 빠진 부서는 23 - 7 = 16명
+        int expectedHeadCountOfNewRoot = 16;
 
-        assertEquals(expected2, newRoot.getTotalHeadCountOfDepartment());
+        assertEquals(expectedHeadCountOfNewRoot, newRoot.getTotalHeadCountOfDepartment());
     }
 
     @Test
@@ -108,7 +110,7 @@ public class DepartmentTest {
     }
 
     @Test
-    public void givenNewDepartment_whenHeadCountIsNotBetween1And1000_thenThrows() {
+    public void givenNewDepartment_whenHeadCountIsNotBetween0And1000_thenThrows() {
         Throwable t = assertThrows(CustomRuntimeException.class, () -> Department.of(-15, "DEV"));
         assertEquals(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT.getMessage(), t.getMessage());
         Throwable t2 = assertThrows(CustomRuntimeException.class, () -> Department.of(1010, "DEV"));
@@ -118,7 +120,7 @@ public class DepartmentTest {
     @Test
     public void givenNewDepartment_whenTryingToSubordinateRoot_thenThrows() {
         Department e = Department.of(10, "E");
-        Throwable t = assertThrows(CustomRuntimeException.class, () -> e.addSubordinate(root));
+        Throwable t = assertThrows(CustomRuntimeException.class, () -> e.add(root));
         assertEquals(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_SUBORDINATED.getMessage(), t.getMessage());
     }
 
@@ -126,12 +128,12 @@ public class DepartmentTest {
     void givenDepartmentAndNewHeadCount_whenUpdateCache_thenSucceed() {
 
         //given
-        int headCount = 10;
-        int expected1 = 24;
+        int changeOfHeadcount = 10;
+        int expectedHeadCountOfRoot = 24;
 
         //when
         // a has 1, updating to 10, so combined headcount will be 15 + 10 - 1 = 24
-        root.updateCache(headCount);
+        root.updateHeadcount(changeOfHeadcount);
 
         List<Integer> results1 = List.of(
                 a.getTotalHeadCountOfDepartment(),
@@ -142,15 +144,21 @@ public class DepartmentTest {
 
         //then
         for (Integer result : results1) {
-            assertEquals(expected1, result);
+            assertEquals(expectedHeadCountOfRoot, result);
         }
 
         //given
-        int expected2 = 30;
+        int expectedHeadCountOfRoot2 = 30;
+
+        // 현재 b와 그 하위부서 c의 합은 3 + 4 = 7, c가 6명 증가하므로 b는 13으로 증가.
+        // 마찬가지로 a의 경우 9명에서 15명으로 증가
+        int expectedHeadCountOfB = 13;
+        int expectedHeadCountOfA = 15;
 
         //when
-        // c has 4 headcount, updating by 10 will result in the increment of 6 in total. 24 + 10 - 4 = 30
-        c.updateCache(headCount);
+        // c 의 인원수가 4명에서 10명으로 6명 늘어남에 따라 이 부서를 포함하는 최상위 부서의 인원수도 변경됨
+        // 또한 c의 상위 부서인 b와 a의 캐시(a 부서와 그 하위부서의 인원수, b 부서와 그 하위부서의 인원수)도 변경
+        c.updateHeadcount(changeOfHeadcount);
 
         List<Integer> results2 = List.of(
                 a.getTotalHeadCountOfDepartment(),
@@ -161,35 +169,12 @@ public class DepartmentTest {
 
         //then
         for (Integer result2 : results2) {
-            assertEquals(expected2, result2);
-        }
-    }
-
-    @Test
-    void departmentCacheUpdateTest() {
-
-        calculateHeadcount(root);
-        calculateHeadcount(a);
-        calculateHeadcount(b);
-        calculateHeadcount(c);
-        calculateHeadcount(d);
-    }
-
-    public static int calculateHeadcount(Department department) {
-        int headcount = department.getHeadCount();
-
-        if (department.getCombinedHeadCount() != null) {
-            return department.getCombinedHeadCount();
+            assertEquals(expectedHeadCountOfRoot2, result2);
         }
 
-        List<Department> subs = department.getSubordinates();
+        assertEquals(expectedHeadCountOfB, b.getCombinedHeadCount());
+        assertEquals(expectedHeadCountOfA, a.getCombinedHeadCount());
 
-        for (Department sub : subs) {
-            headcount += calculateHeadcount(sub);
-        }
-
-        department.setCombinedHeadCount(headcount);
-
-        return headcount;
     }
+
 }

@@ -42,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public void update(String departmentName, int headcount) {
         Department d = findBy(departmentName);
-        d.updateCache(headcount);
+        d.updateHeadcount(headcount);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department sup = findBy(superior);
         Department sub = findBy(subordinate);
 
-        sup.addSubordinate(sub);
+        sup.add(sub);
         return sub.relationToString();
     }
 

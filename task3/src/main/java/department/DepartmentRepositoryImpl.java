@@ -38,9 +38,9 @@ public class DepartmentRepositoryImpl implements DepartmentRepository {
         Department backend = new Department(20, "BACKEND", false);
         Department frontend = new Department(20, "FRONTEND", false);
         Department devops = new Department(30, "DEVOPS", false);
-        dev.addSubordinate(backend);
-        dev.addSubordinate(frontend);
-        dev.addSubordinate(devops);
+        dev.add(backend);
+        dev.add(frontend);
+        dev.add(devops);
 
         put(dev);
         put(backend);

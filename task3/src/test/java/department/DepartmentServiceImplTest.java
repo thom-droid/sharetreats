@@ -59,7 +59,7 @@ public class DepartmentServiceImplTest {
         Department root = departmentRepository.save(Department.of(5, "TESTROOT", true));
         Department superior = departmentRepository.save(Department.of(10, "SUP"));
         Department subordinate = departmentRepository.save(Department.of(5, "SUB"));
-        root.addSubordinate(superior);
+        root.add(superior);
 
         //when
         String result = assertDoesNotThrow(() -> departmentService.relate(superior.getName(), subordinate.getName()));
@@ -68,18 +68,15 @@ public class DepartmentServiceImplTest {
     }
 
     @Test
-    void givenTwoExistingDepartments_whenRelatedWithoutRoot_thenThrows() {
+    void givenTwoExistingDepartments_whenRelatedWithoutRoot_thenSucceed() {
 
         //given
         Department superior = departmentRepository.save(Department.of(10, "SUP"));
         Department subordinate = departmentRepository.save(Department.of(5, "SUB"));
 
         //when
-        Throwable t = assertThrows(
-                CustomRuntimeException.class, () -> departmentService.relate(superior.getName(), subordinate.getName())
-        );
+        assertDoesNotThrow(() -> departmentService.relate(superior.getName(), subordinate.getName()));
 
-        assertEquals(CustomRuntimeExceptionCode.NO_SUPERIOR_IS_SET.getMessage(), t.getMessage());
     }
 
 }

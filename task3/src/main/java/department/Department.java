@@ -9,10 +9,11 @@ import java.util.Objects;
 
 public class Department {
 
+    private static final String MESSAGE_WITHOUT_ROOT = "최상위 부서가 설정되어 있지 않아 현재 부서의 상위 부서 중 최고 부서의 정보가 표시됩니다.";
     private static final String REGEX = "[A-Z]+";
 
     private int headCount;
-    private Integer combinedHeadCount;
+    private int combinedHeadCount;
     private final String name;
     private final List<Department> subordinates;
     private Department superior;
@@ -24,9 +25,6 @@ public class Department {
         this.name = name;
         this.subordinates = new LinkedList<>();
         this.isRoot = isRoot;
-        if (isRoot) {
-            this.combinedHeadCount = headCount;
-        }
     }
 
     public static Department of(int headCount, String name) {
@@ -43,32 +41,29 @@ public class Department {
         this.isRoot = true;
     }
 
-    public void addSubordinate(Department subordinate) {
+    public void add(Department subordinate) {
+        // 추가하려는 부서가 null 이면 리턴
         if (subordinate == null) {
             return;
         }
 
+        // 추가하려는 부서가 최상위 부서면 예외 처리
         if (subordinate.isThisRoot()) {
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.ROOT_CANNOT_BE_SUBORDINATED);
         }
 
+        // 이미 관계가 설정된 부서면 리턴
         if (alreadyRelatedTo(subordinate)) {
             return;
         }
 
-        Department root = findRoot();
+        // 캐시 업데이트를 위해 현재 부서의 루트(최상위)를 찾음. 없는 경우 가장 상위의 부서를 리턴
+        // 새로 추가하는 부서의 사람 수를 현재 부서에 더해 캐시를 업데이트. 루트가 존재하는 경우 루트도 하위 부서에 설정
+        Department root = findRootOrHighest();
         updateSubordinatesAndCache(subordinate, root);
-        relateTo(subordinate);
     }
 
-    public void updateHeadCount(int headCount) {
-        Department root = findRoot();
-        int tmp = this.headCount;
-        this.headCount = headCount;
-        root.combinedHeadCount += headCount - tmp;
-    }
-
-    public Integer getCombinedHeadCount() {
+    public int getCombinedHeadCount() {
         return combinedHeadCount;
     }
 
@@ -80,31 +75,24 @@ public class Department {
         return subordinates;
     }
 
-    public Department getSuperior() {
-        return superior;
-    }
-
     public Department getRoot() {
         return root;
     }
 
-    public int getHeadCount() {
-        return headCount;
-    }
-
-    public void setCombinedHeadCount(Integer combinedHeadCount) {
-        this.combinedHeadCount = combinedHeadCount;
-    }
-
-    public void updateCache(int headCount) {
-        int tmp = this.headCount;
+    public void updateHeadcount(int headCount) {
         this.headCount = headCount;
-        Department root = findRoot();
-        root.combinedHeadCount += headCount - tmp;
+        updateHeadcount();
     }
 
     public int getTotalHeadCountOfDepartment() {
-        return findRoot().combinedHeadCount;
+        if (isThisRoot()) {
+            return this.combinedHeadCount;
+        }
+        Department highest = findRootOrHighest();
+        if (highest == null) {
+            return this.combinedHeadCount;
+        }
+        return highest.combinedHeadCount;
     }
 
     public boolean isThisRoot() {
@@ -116,14 +104,15 @@ public class Department {
     }
 
     public String relationToString() {
-        String root = this.root == null? "최상위 부서가 설정되어 있지 않습니다." : this.root.getName();
-        String count = this.root == null ?
-                "최상위 부서가 설정되어 있지 않아 현재 부서의 인원만 출력됩니다. " + this.headCount
-                : ""+ this.root.combinedHeadCount;
+        if (this.root == null) {
+            Department highest = findRootOrHighest();
+            return MESSAGE_WITHOUT_ROOT + "\n" +
+                    "현재부서: [ " + this.getName() + " ], " +
+                    "상위부서: [ " + highest.getName()+ " ], " +
+                    "총 인원: [ " + highest.combinedHeadCount +" ]";
+        }
 
-        return "현재부서: " + this.getName() + " ] \n" +
-                "최상위부서: " + root + ", " +
-                "총 인원: " + count;
+        return root.getName() + ", " + root.getCombinedHeadCount();
     }
 
     @Override
@@ -139,12 +128,10 @@ public class Department {
         return Objects.hash(name);
     }
 
-    private Department findRoot() {
-
+    private Department findRootOrHighest() {
         if (!isThisRoot()) {
-            return findRootOf(this);
+            return findRootOrHighest(this, null);
         }
-
         return this;
     }
 
@@ -153,54 +140,95 @@ public class Department {
     }
 
     private void updateSubordinatesAndCache(Department subordinate, Department newRoot) {
-        Department oldRoot = subordinate.root;
-        int subHeadCount = calculateHeadCountAndSetRoot(subordinate, newRoot);
 
-        if (oldRoot != null) {
+        updateCombinedHeadCountFrom(subordinate);
+        updateRelationOf(subordinate);
 
+        // 현재 부서의 최상위 부서가 있다면 추가하려는 하위 부서의 모든 하위 부서에도 최상위 부서를 설정하고 캐시 업데이트
+        if(newRoot != null) {
+            setRoot(subordinate, newRoot);
         }
 
-        newRoot.combinedHeadCount += subHeadCount;
+        // 현재 부서의 최상위부서까지 부서 인원 수 업데이트
+        if (this.superior != null) {
+            Department sup = this.superior;
+            sup.updateHeadcount();
+        }
+    }
+
+    private void updateCombinedHeadCountFrom(Department subordinate) {
+        // cache 설정
+        if (this.combinedHeadCount == 0) {
+            this.combinedHeadCount = headCount;
+        }
+
+        int subHeadcount = subordinate.calculateHeadCount();
+
+        if (this.combinedHeadCount + subHeadcount > 1000) {
+            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT);
+        }
+
+        this.combinedHeadCount += subHeadcount;
+    }
+
+    private void updateRelationOf(Department subordinate) {
+        // 추가하려는 하위 부서가 최상위 루트를 가지고 있었다면 그 상위 부서로부터 제거하고, 그 상위 부서의 캐시 업데이트
+        Department oldSup = subordinate.superior;
+        if (oldSup != null) {
+            oldSup.remove(subordinate);
+        }
+
+        // 상위 부서 - 하위 부서 관계 설정
+        relateTo(subordinate);
     }
 
     private void remove(Department subordinate) {
-
         if (this.getSubordinates().remove(subordinate)) {
-            updateCache(this);
+            updateHeadcount();
         }
-
-        updateCache(this);
-
     }
 
-    private void updateCache(Department department) {
-        int count = department.headCount;
+    private void updateHeadcount() {
+        int count = headCount;
 
         for (Department subordinate : subordinates) {
-            count += subordinate.getCombinedHeadCount();
+            count += subordinate.calculateHeadCount();
         }
 
         combinedHeadCount = count;
+        Department sup = this.superior;
 
-        Department sup = department.superior;
-        if(sup != null) updateCache(sup);
-
+        if (sup != null) {
+            sup.updateHeadcount();
+        }
     }
 
-    private int calculateHeadCountAndSetRoot(Department department, Department newRoot) {
-        int count = department.headCount;
+    private int calculateHeadCount() {
+        int count = headCount;
 
-        if (department.combinedHeadCount != null) return department.combinedHeadCount;
+        // 캐시된 부서 총원이 있다면 바로 리턴
+        if (combinedHeadCount != 0) return combinedHeadCount;
 
-        List<Department> subordinates = department.getSubordinates();
+        List<Department> subordinates = getSubordinates();
 
-        for (Department s : subordinates) count += calculateHeadCountAndSetRoot(s, newRoot);
+        for (Department s : subordinates) count += s.calculateHeadCount();
 
-        department.combinedHeadCount = count;
-
-        if(newRoot != null) department.root = newRoot;
+        // 하위 부서가 다른 하위 부서를 가지는 경우를 탐색 시간을 줄이기 위해 캐싱
+        combinedHeadCount = count;
 
         return count;
+    }
+
+    private void setRoot(Department subordinate, Department root) {
+        if (subordinate.root == root) {
+            return;
+        }
+
+        subordinate.root = root;
+
+        for (Department sub : subordinate.getSubordinates()) {
+            setRoot(sub, root);
+        }
     }
 
     private void relateTo(Department subordinate) {
@@ -208,11 +236,11 @@ public class Department {
         subordinate.superior = this;
     }
 
-    private Department findRootOf(Department department) {
+    private Department findRootOrHighest(Department department, Department prev) {
         if (department == null)
-            throw new CustomRuntimeException(CustomRuntimeExceptionCode.NO_SUPERIOR_IS_SET);
+            return prev;
         if (!department.isRoot)
-            department = findRootOf(department.superior);
+            department = findRootOrHighest(department.superior, department);
 
         return department;
     }
@@ -231,6 +259,4 @@ public class Department {
         if (headCount <= 0 || headCount > 1000)
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_HEADCOUNT);
     }
-
-
 }
