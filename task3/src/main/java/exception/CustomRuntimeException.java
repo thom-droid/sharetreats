@@ -9,6 +9,12 @@ public class CustomRuntimeException extends RuntimeException {
         this.customRuntimeExceptionCode = customRuntimeExceptionCode;
     }
 
+    public CustomRuntimeException(Throwable throwable, CustomRuntimeExceptionCode customRuntimeExceptionCode) {
+        super(throwable);
+        this.customRuntimeExceptionCode = customRuntimeExceptionCode;
+    }
+
+
     public String getMessage() {
         return customRuntimeExceptionCode.getMessage();
     }
