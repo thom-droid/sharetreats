@@ -12,7 +12,7 @@ public interface DepartmentService {
 
     void delete(String departmentName);
 
-    void update(String departmentName, int headcount);
+    String update(Department department);
 
     String relate(String superior, String subordinate);
 

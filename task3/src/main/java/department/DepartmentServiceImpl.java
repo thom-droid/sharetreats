@@ -30,7 +30,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         String name = department.getName();
         departmentRepository.findBy(name).ifPresent(Department::throwDuplicatedNameException);
 
-        return departmentRepository.save(department).getName();
+        return departmentRepository.save(department).toString();
     }
 
     @Override
@@ -40,17 +40,23 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public void update(String departmentName, int headcount) {
-        Department d = findBy(departmentName);
-        d.updateHeadcount(headcount);
+    public String update(Department department) {
+        Department d = findBy(department.getName());
+        d.updateHeadcount(department.getHeadCount());
+        return d.toString();
     }
 
     @Override
     public String relate(String superior, String subordinate) {
-        Department sup = findBy(superior);
+
         Department sub = findBy(subordinate);
 
-        sup.add(sub);
+        if (superior.equals("*")) {
+            sub.setAsRoot();
+        } else {
+            Department sup = findBy(superior);
+            sup.add(sub);
+        }
         return sub.relationToString();
     }
 

@@ -5,6 +5,8 @@ import exception.CustomRuntimeExceptionCode;
 import org.junit.jupiter.api.Test;
 import test_utils.DepartmentRepositoryTestImpl;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DepartmentServiceImplTest {
@@ -79,4 +81,90 @@ public class DepartmentServiceImplTest {
 
     }
 
+    @Test
+    void givenDepartmentThatHasSubordinates_whenSetAsRoot_thenAlsoRootOfSubordinatesSet() {
+
+        //given
+        Department a = departmentRepository.save(Department.of(10, "A"));
+        Department b = departmentRepository.save(Department.of(15, "B"));
+        Department c = departmentRepository.save(Department.of(7, "C"));
+
+        //b>c
+        departmentService.relate(b.getName(), c.getName());
+
+        //a>b
+        departmentService.relate(a.getName(), b.getName());
+
+        //when *>a,
+        departmentService.relate("*", a.getName());
+
+        //then
+        assertEquals(a, b.getRoot());
+        assertEquals(a, c.getRoot());
+
+    }
+
+    @Test
+    void givenDepartmentThatHasRoot_whenSetAsRoot_thenThrows() {
+        //given
+        Department a = departmentRepository.save(Department.of(10, "A"));
+        Department b = departmentRepository.save(Department.of(15, "B"));
+        Department c = departmentRepository.save(Department.of(7, "C"));
+
+        //b>c
+        departmentService.relate(b.getName(), c.getName());
+
+        //a>b
+        departmentService.relate(a.getName(), b.getName());
+
+        //when *>a,
+        departmentService.relate("*", a.getName());
+
+        //then
+        Throwable t = assertThrows(
+                CustomRuntimeException.class, () -> departmentService.relate("*", b.getName()));
+        Throwable t2 = assertThrows(
+                CustomRuntimeException.class, () -> departmentService.relate("*", c.getName()));
+
+        assertEquals(CustomRuntimeExceptionCode.ROOT_IS_ALREADY_SET.getMessage(), t.getMessage());
+        assertEquals(CustomRuntimeExceptionCode.ROOT_IS_ALREADY_SET.getMessage(), t2.getMessage());
+    }
+
+    @Test
+    void givenDepartmentWithNewHeadCount_whenUpdate_thenSucceeds() {
+
+        //given
+        Department a = departmentRepository.save(Department.of(10, "A", true));
+        Department b = departmentRepository.save(Department.of(5, "B"));
+        Department c = departmentRepository.save(Department.of(8, "C"));
+        Department d = departmentRepository.save(Department.of(12, "D"));
+
+        //relation *>A>B>C>D, total headcount 35
+        departmentService.relate("*", a.getName());
+        departmentService.relate(a.getName(), b.getName());
+        departmentService.relate(b.getName(), c.getName());
+        departmentService.relate(c.getName(), d.getName());
+
+        int expectedHeadCount = 15;
+        int expectedTotalHeadCount = 38;
+
+        //when
+        Department updated = Department.of(15, "D");
+
+        departmentService.update(updated);
+
+        int actualHeadcount = d.getHeadCount();
+
+        List<Integer> actualTotalHeadCounts = List.of(
+                a.getTotalHeadCountOfDepartment(),
+                b.getTotalHeadCountOfDepartment(),
+                c.getTotalHeadCountOfDepartment(),
+                d.getTotalHeadCountOfDepartment());
+
+        //then
+        assertEquals(expectedHeadCount, actualHeadcount);
+        for (Integer actual : actualTotalHeadCounts) {
+            assertEquals(expectedTotalHeadCount, actual);
+        }
+    }
 }
