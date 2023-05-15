@@ -10,6 +10,7 @@ import voucher.VoucherService;
 import voucher.VoucherServiceImpl;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class Claim extends AbstractCommand {
 
@@ -63,8 +64,8 @@ public class Claim extends AbstractCommand {
     }
 
     private void validateShopCode(String shopCode) {
-        String shopCodeRegex = createRegex(shopCodeCharset);
-        if (shopCode.length() != shopCodeLength || !shopCode.matches(shopCodeRegex)) {
+        Pattern regex = createRegex(shopCodeCharset);
+        if (shopCode.length() != shopCodeLength || !regex.matcher(shopCode).matches()) {
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.ILLEGAL_ARGUMENT_MALFORMED_CODE);
         }
     }
