@@ -1,5 +1,6 @@
 import command.*;
 import command.commands.Help;
+import exception.CustomRuntimeException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +12,7 @@ public class VoucherMachineMain {
 
         CommandFactory commandFactory = new CommandFactoryImpl(CommandEnum.class);
         CommandEnumWrapperFactory commandProcessorFactory = new CommandEnumWrapperFactory(commandFactory);
-        CommandEnumWrapper commandProcessor = commandProcessorFactory.createCommandProcessor();
+        CommandEnumWrapper commandProcessor = commandProcessorFactory.createCommandEnumWrapper();
         CommandController commandController = new CommandController(commandProcessor);
 
         boolean runtime = true;
@@ -21,15 +22,18 @@ public class VoucherMachineMain {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             String line = br.readLine();
             System.out.println("입력된 커맨드 : " + line);
+            try {
 
-            String result = commandController.process(line);
+                String result = commandController.process(line);
+                if (result.equals("EXIT")) {
+                    System.out.println("프로그램을 종료합니다.");
+                    break;
+                }
 
-            if (result.equals("EXIT")) {
-                System.out.println("프로그램을 종료합니다.");
-                break;
+                System.out.println(result);
+            } catch (CustomRuntimeException e) {
+                System.out.println(e.getMessage());
             }
-
-            System.out.println(result);
         }
     }
 }

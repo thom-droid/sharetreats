@@ -8,8 +8,6 @@ public class CommandFactoryImpl implements CommandFactory {
         this.command = command;
     }
 
-    //Todo 설명 구체적으로 적기
-    // enum 의 supplier가 수행되어 리턴값이 싱글턴 인스턴스가 할당
     @Override
     public CommandEnumWrapper createCommandProcessor() {
 

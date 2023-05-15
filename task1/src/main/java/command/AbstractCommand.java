@@ -8,6 +8,8 @@ import voucher.VoucherService;
 
 import java.util.Objects;
 
+/** 각 명령어가 입력받은 내용을 검증할 수 있도록 공통 메서드를 정의한 추상 클래스입니다. */
+
 public abstract class AbstractCommand implements Command {
 
     protected final int itemCodeLength;

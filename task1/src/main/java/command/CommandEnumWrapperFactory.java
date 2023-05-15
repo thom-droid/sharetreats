@@ -8,7 +8,7 @@ public class CommandEnumWrapperFactory {
         this.commandFactory = commandFactory;
     }
 
-    public CommandEnumWrapper createCommandProcessor() {
+    public CommandEnumWrapper createCommandEnumWrapper() {
         return commandFactory.createCommandProcessor();
     }
 

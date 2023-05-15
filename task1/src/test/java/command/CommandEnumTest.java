@@ -1,5 +1,6 @@
 package command;
 
+import command.commands.Check;
 import test_util.CommandTestUtils;
 import test_util.TestMockData;
 import org.junit.jupiter.api.Test;
@@ -34,5 +35,17 @@ class CommandEnumTest {
         String input = "claim " + shopCode + " " + itemCode;
 
         assertDoesNotThrow(() -> commandController.process(input));
+    }
+
+    @Test
+    public void givenCommandName_thenFindTheSameInstance() {
+
+        String command = "CHECK";
+
+        Command command1 = CommandEnum.CHECK.findCommand(command);
+        Command command2 = Check.getInstance();
+
+        assertEquals(command1, command2);
+
     }
 }
