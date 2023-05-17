@@ -10,10 +10,9 @@ public class VoucherMachineMain {
 
     public static void main(String[] args) throws IOException {
 
-        CommandFactory commandFactory = new CommandFactoryImpl(CommandEnum.class);
-        CommandEnumWrapperFactory commandProcessorFactory = new CommandEnumWrapperFactory(commandFactory);
-        CommandEnumWrapper commandProcessor = commandProcessorFactory.createCommandEnumWrapper();
-        CommandController commandController = new CommandController(commandProcessor);
+        CommandEnumWrapperFactory commandEnumWrapperFactory = new CommandEnumWrapperFactoryImpl(CommandEnum.class);
+        CommandEnumWrapper commandEnumWrapper = commandEnumWrapperFactory.createCommandEnumWrapper();
+        CommandController commandController = new CommandController(commandEnumWrapper);
 
         boolean runtime = true;
         System.out.println(Help.MESSAGE);

@@ -1,15 +1,10 @@
 package command;
 
-public class CommandEnumWrapperFactory {
+/**
+ * {@link CommandEnumWrapper} 구현체를 생성하기 위한 팩토리입니다.
+ */
+public interface CommandEnumWrapperFactory {
 
-    private final CommandFactory commandFactory;
-
-    public CommandEnumWrapperFactory(CommandFactory commandFactory) {
-        this.commandFactory = commandFactory;
-    }
-
-    public CommandEnumWrapper createCommandEnumWrapper() {
-        return commandFactory.createCommandProcessor();
-    }
+    CommandEnumWrapper createCommandEnumWrapper();
 
 }

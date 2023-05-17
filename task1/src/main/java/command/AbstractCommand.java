@@ -48,26 +48,8 @@ public abstract class AbstractCommand implements Command {
         return input.split(" ");
     }
 
-    protected Pattern createRegex(String charset) {
-        if (charset.equals(CodeGeneratorConfigurer.Charset.NUMERIC)) {
-            return NUMERIC_REGEX;
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_LOWERCASE)) {
-            return ALPHABET_LOWERCASE_REGEX;
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_UPPERCASE)) {
-            return ALPHABET_UPPERCASE_REGEX;
-        }
-
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET)) {
-            return ALPHABET_REGEX;
-        }
-
-        return NUMERIC_REGEX;
-    }
-
+    // 상점 코드르를 검증합니다. 설정한 코드의 길이와 일치하는지, 띄어쓰기는 제대로 되었는지, 설정한 charset 과 일치하는지 검증합니다.
+    // 검증에 성공하면 실행에 알맞는 형태의 문자열로 리턴합니다
     protected String createValidatedItemCodeFrom(String[] codeSegment) {
         Pattern regex = createRegex(itemCodeCharset);
         int len = 0;
@@ -95,4 +77,26 @@ public abstract class AbstractCommand implements Command {
 
         return String.join(" ", codeSegment[0], codeSegment[1], codeSegment[2]);
     }
+
+    // 코드 설정에 따라 코드를 검색할 정규식을 세팅합니다
+    protected Pattern createRegex(String charset) {
+        if (charset.equals(CodeGeneratorConfigurer.Charset.NUMERIC)) {
+            return NUMERIC_REGEX;
+        }
+
+        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_LOWERCASE)) {
+            return ALPHABET_LOWERCASE_REGEX;
+        }
+
+        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_UPPERCASE)) {
+            return ALPHABET_UPPERCASE_REGEX;
+        }
+
+        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET)) {
+            return ALPHABET_REGEX;
+        }
+
+        return NUMERIC_REGEX;
+    }
+
 }
