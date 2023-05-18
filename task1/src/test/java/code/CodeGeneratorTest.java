@@ -26,7 +26,7 @@ public class CodeGeneratorTest {
 
         //given
         Integer length = 12;
-        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.createWithLength(length);
+        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.builder().length(length).build();
         CodeGenerator codeGenerator = CodeGenerator.build(codeGeneratorConfigurer);
         Integer space = codeGenerator.getConfig().getSpace();
         HashSet<String> pool = codeGenerator.generate();
@@ -43,7 +43,7 @@ public class CodeGeneratorTest {
 
         //given
         String charset = CodeGeneratorConfigurer.Charset.ALPHABET_UPPERCASE;
-        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.createWithCharset(charset);
+        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.builder().charset(charset).build();
         CodeGenerator codeGenerator = CodeGenerator.build(codeGeneratorConfigurer);
         HashSet<String> pool = codeGenerator.generate();
         String regex = "[A-Z]+";
@@ -61,7 +61,7 @@ public class CodeGeneratorTest {
 
         //given
         Integer amount = 10;
-        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.createWithAmount(amount);
+        CodeGeneratorConfigurer codeGeneratorConfigurer = CodeGeneratorConfigurer.builder().amount(amount).build();
         CodeGenerator codeGenerator = CodeGenerator.build(codeGeneratorConfigurer);
         HashSet<String> pool = codeGenerator.generate();
 

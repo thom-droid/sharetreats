@@ -33,11 +33,6 @@ public enum CommandEnum implements CommandEnumWrapper {
     }
 
     @Override
-    public String process(String command) {
-        return this.command.process(command);
-    }
-
-    @Override
     public Command findCommand(String command) {
         CommandEnum commandEnum = Arrays.stream(this.getClass().getEnumConstants())
                 .filter(e -> e.name().equals(command.toUpperCase(Locale.ROOT)))
