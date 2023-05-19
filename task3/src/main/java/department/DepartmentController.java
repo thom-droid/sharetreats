@@ -1,5 +1,6 @@
 package department;
 
+import command.CommandRegex;
 import exception.CustomNumberFormatException;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
@@ -7,11 +8,6 @@ import exception.CustomRuntimeExceptionCode;
 import java.util.Arrays;
 
 public class DepartmentController {
-
-    private static final String COMMAND_REGEX = "^[A-Z>,*\\s\\d]+$";
-    private static final String COMMA_REGEX = "^(?:[^,]*,){1}[^,]*$";
-    private static final String RELATION_REGEX = "^(?:[^>]*>){1}[^>]*$";
-    private static final String UPDATE_REGEX = "^(?:[^@]*>){1}[^@]*$";
 
     private final DepartmentService departmentService;
 
@@ -21,11 +17,11 @@ public class DepartmentController {
 
     public String parseCommand(String input) {
 
-        if (!input.matches(COMMAND_REGEX)) {
+        if (!(CommandRegex.COMMAND.matches(input))) {
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_COMMAND);
         }
 
-        if (input.matches(COMMA_REGEX)) {
+        if (CommandRegex.COMMA.matches(input)) {
 
             String[] segments = segment(input, ",");
 
@@ -33,7 +29,7 @@ public class DepartmentController {
 
             return departmentService.post(department);
 
-        } else if (input.matches(RELATION_REGEX)) {
+        } else if (CommandRegex.RELATION.matches(input)) {
 
             String[] segments = segment(input, ">");
 
@@ -44,7 +40,7 @@ public class DepartmentController {
 
             return departmentService.relate(sup, sub);
 
-        } else if (input.matches(UPDATE_REGEX)) {
+        } else if (CommandRegex.UPDATE.matches(input)) {
 
             String[] segments = segment(input, "@");
 
@@ -52,10 +48,12 @@ public class DepartmentController {
 
             return departmentService.update(department);
 
-        } else {
-            String name = validateName(input.trim());
-            return departmentService.getDepartment(name);
+        } else if (CommandRegex.UPPERCASE.matches(input)) {
+
+            return departmentService.getDepartment(input);
         }
+
+        throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_COMMAND);
     }
 
     private String[] segment(String input, String delimiter) {
@@ -68,7 +66,7 @@ public class DepartmentController {
     }
 
     private String validateName(String name) {
-        if (!name.matches(Department.REGEX))
+        if (!CommandRegex.UPPERCASE.matches(name))
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_NAME);
         return name;
     }
@@ -87,5 +85,4 @@ public class DepartmentController {
         int headcount = validateHeadCount(segments[1]);
         return Department.of(headcount, name);
     }
-
 }

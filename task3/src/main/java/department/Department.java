@@ -1,5 +1,6 @@
 package department;
 
+import command.CommandRegex;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
 
@@ -10,7 +11,6 @@ import java.util.Objects;
 public class Department {
 
     private static final String MESSAGE_WITHOUT_ROOT = "최상위 부서가 설정되어 있지 않아 현재 부서의 상위 부서 중 최고 부서의 정보가 표시됩니다.";
-    public static final String REGEX = "[A-Z]+";
 
     private int headCount;
     private int combinedHeadCount;
@@ -276,7 +276,7 @@ public class Department {
     }
 
     private static void validate(String departmentName) {
-        if (!departmentName.matches(REGEX))
+        if (!CommandRegex.UPPERCASE.matches(departmentName))
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_NAME);
     }
 
