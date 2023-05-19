@@ -3,6 +3,8 @@ package item;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/** 경품을 의미하는 클래스입니다. 생성자를 통해서만 초기화할 수 있도록하여 불변한 인스턴스가 되도록 작성헀습니다. */
+
 public final class Item {
 
     private final String name;

@@ -5,7 +5,7 @@ import java.util.Random;
 
 /** 상품 교환권 코드, 상점 코드를 생성하는 클래스입니다. 인스턴스가 생성되면 변수가 수정되지 않는 불변 클래스입니다.
  * <p>
- * {@link CodeGeneratorConfigurer}로 코드 생성을 위한 설정을 한 뒤 {@code build()}를 호출하여 인스턴스를 생성할 수 있습니다.
+ * {@link CodeGeneratorConfigure}로 코드 생성을 위한 설정을 한 뒤 {@code build()}를 호출하여 인스턴스를 생성할 수 있습니다.
  * 설정 파일이 따로 주어지지 않는 경우 기본 설정 값으로 '### ### ###' 형태의 숫자로 이루어진 문자열을 생성합니다.
  * </p>
  *
@@ -21,9 +21,9 @@ public final class CodeGenerator {
     private final Integer amount;
     private final char[] chars;
     private final Integer space;
-    private final CodeGeneratorConfigurer config;
+    private final CodeGeneratorConfigure config;
 
-    private CodeGenerator(CodeGeneratorConfigurer config) {
+    private CodeGenerator(CodeGeneratorConfigure config) {
         this.amount = config.getAmount();
         this.length = config.getLength();
         this.chars = config.getCharset().toCharArray();
@@ -32,10 +32,10 @@ public final class CodeGenerator {
     }
 
     public static CodeGenerator build() {
-        return new CodeGenerator(CodeGeneratorConfigurer.builder().build());
+        return new CodeGenerator(CodeGeneratorConfigure.builder().build());
     }
 
-    public static CodeGenerator build(CodeGeneratorConfigurer config) {
+    public static CodeGenerator build(CodeGeneratorConfigure config) {
         return new CodeGenerator(config);
     }
 
@@ -66,7 +66,7 @@ public final class CodeGenerator {
         return sb.toString();
     }
 
-    public CodeGeneratorConfigurer getConfig() {
+    public CodeGeneratorConfigure getConfig() {
         return this.config;
     }
 

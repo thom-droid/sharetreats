@@ -8,6 +8,41 @@ import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * <p>
+ *     {@link LotteryInventory} 구현체입니다.
+ *     인스턴스화할 때 각 등급에 맞는 상품을 생성하여 {@link List}로 관리합니다.
+ * </p>
+ * <p>
+ *     상품의 당첨 확률은 {@link Random} 클래스를 활용했습니다. A 상품의 당첨 확률은 90,
+ *     B 상품은 10으로 설정하고, {@code random.nextInt()}로 1부터 100까지의 숫자를 임의로 뽑아
+ *     나온 숫자가 상품의 당첨 확률에 해당하는지 확인하는 방식으로 동작하도록 설정했습니다. 당첨의 유무는
+ *     {@code Optional<Item>}의 값이 null이면 꽝, 그렇지 않으면 당첨으로 구분할 수 있게 했습니다.
+ *
+ * </p>
+ * <p>
+ *     핵심 메서드인 pick()은 다음과 같이 동작합니다.
+ *
+ *     <li>
+ *         숫자를 뽑습니다. 1 ~ 90 이면 A 상품을 뽑습니다. 결과를 담은 {@code Optional<Item>}를
+ *         리턴합니다.
+ *     </li>
+ *     <li>
+ *         리턴한 {@code Optional}의 값이 null이 아니라면 A가 당첨된 것이므로 리턴합니다.
+ *     </li>
+ *     <li>
+ *         그렇지 않으면 꽝이므로, 다시 숫자를 뽑아 B 당첨 확률에 해당하는지 확인하고 {@code Optional}
+ *         객체를 리턴합니다. 이 때 B 상품은 총 3번까지만 당첨될 수 있으므로, 당첨된 경우 countB 필드의
+ *         값을 감소시킵니다.
+ *     </li>
+ *     <li>
+ *         이 메서드를 호출한 객체는 리턴값의 내용물을 확인하고 값이 비었으면 꽝, 그렇지 않으면 상품의 정보를
+ *         출력할 수 있게 됩니다.
+ *     </li>
+ * </p>
+ *
+ * */
+
 public class LotteryInventoryImpl implements LotteryInventory {
 
     private final List<Item> gradeA;

@@ -1,7 +1,7 @@
 package mock;
 
 import code.CodeGenerator;
-import code.CodeGeneratorConfigurer;
+import code.CodeGeneratorConfigure;
 import code.CodeGeneratorConfigGetter;
 import shop.Item;
 import shop.Shop;
@@ -18,7 +18,7 @@ import java.util.*;
  * <p>
  *     데이터베이스 역할을 하는 클래스입니다. 기본 생성자를 통해 인스턴스가 생성될 때 {@link MockupDataImpl#setupStorage}가
  *     호출되어 예시로 사용할 교환권 20장을 생성합니다.
- *     이 설정은 생성자 오버라이딩의 파라미터로 {@link CodeGeneratorConfigurer}를 사용함으로써 변경할 수 있습니다.
+ *     이 설정은 생성자 오버라이딩의 파라미터로 {@link CodeGeneratorConfigure}를 사용함으로써 변경할 수 있습니다.
  * </p>
  * <p>
  *     코드자체는 중복을 막기 위해 {@link HashSet}으로 생성되며 {@code itemCode}에 할당됩니다.
@@ -45,7 +45,7 @@ public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
     private final HashSet<String> itemCode;
     private final HashSet<String> shopCode;
 
-    public MockupDataImpl(CodeGeneratorConfigurer itemCodeConfig, CodeGeneratorConfigurer shopCodeConfig) {
+    public MockupDataImpl(CodeGeneratorConfigure itemCodeConfig, CodeGeneratorConfigure shopCodeConfig) {
         this.itemCodeGenerator = CodeGenerator.build(itemCodeConfig);
         this.itemCode = itemCodeGenerator.generate();
         this.shopCodeGenerator = CodeGenerator.build(shopCodeConfig);
@@ -57,10 +57,10 @@ public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
         this.itemCodeGenerator = CodeGenerator.build();
         this.itemCode = itemCodeGenerator.generate();
         this.shopCodeGenerator = CodeGenerator.build(
-                CodeGeneratorConfigurer.builder()
+                CodeGeneratorConfigure.builder()
                         .length(6)
                         .amount(4)
-                        .charset(CodeGeneratorConfigurer.Charset.ALPHABET)
+                        .charset(CodeGeneratorConfigure.Charset.ALPHABET)
                         .space(0)
                         .build());
         this.shopCode = shopCodeGenerator.generate();
@@ -149,12 +149,12 @@ public class MockupDataImpl implements MockupData, CodeGeneratorConfigGetter {
     }
 
     @Override
-    public CodeGeneratorConfigurer getItemCodeConfig() {
+    public CodeGeneratorConfigure getItemCodeConfig() {
         return itemCodeGenerator.getConfig();
     }
 
     @Override
-    public CodeGeneratorConfigurer getShopCodeConfig() {
+    public CodeGeneratorConfigure getShopCodeConfig() {
         return shopCodeGenerator.getConfig();
     }
 }

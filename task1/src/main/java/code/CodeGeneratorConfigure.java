@@ -1,21 +1,22 @@
 package code;
 
-/** 코드 생성을 위한 설정 파일입니다. 생성될 코드의 길이, 개수, 인코딩 등의 설정을 할 수 있습니다.
- *  {@code create()}를 통해 인스턴스를 생성할 수 있으며, {@link CodeGenerator}의 생성자의 파라미터로 사용하여 코드 설정이 가능합니다.
+/**
+ * 코드 생성을 위한 설정 파일입니다. 생성될 코드의 길이, 개수, 인코딩 등의 설정을 할 수 있습니다.
+ * 파라미터의 개수가 많으므로 빌더 패턴으로 세팅할 수 있게 구성하였습니다.
  *
- * <pre>{@code
- *      CodeGeneratorConfigurer config =
- *              CodeGeneratorConfigurer.create(6, 4, Charset.ALPHABET, 0);
+ * <pre>
+ *     {@code
+ *      CodeGeneratorConfigure config =
+ *              CodeGeneratorConfigure.builder().length(6).amount(4).build();
  *      CodeGenerator generator = CodeGenerator.build(config);
  *      HashSet<String> code = generator.generate();
- * }
+ *      }
  * </pre>
- *
  * 위와 같은 설정을 했을 때 {@code "aBcDef"}와 같이 띄어쓰기 없이 알파벳 대소문자로 이루어진 길이 6의 {@code String}이 4개 생성됩니다.
  * 아무 설정도 하지 않을 경우 {@code "### ### ###"}와 같이 숫자로 이루어진 길이 9의 {@code String}이 20개 생성됩니다.
- * */
+ *  */
 
-public class CodeGeneratorConfigurer {
+public class CodeGeneratorConfigure {
 
     private final Integer length;
     private final Integer amount;
@@ -29,7 +30,7 @@ public class CodeGeneratorConfigurer {
         public static final String NUMERIC = "0123456789";
     }
 
-    private CodeGeneratorConfigurer(Integer length, Integer amount, String charset, Integer space) {
+    private CodeGeneratorConfigure(Integer length, Integer amount, String charset, Integer space) {
         if (length == null) {
             length = 9;
         }
@@ -52,15 +53,11 @@ public class CodeGeneratorConfigurer {
         this.space = space;
     }
 
-    private CodeGeneratorConfigurer(Builder builder) {
+    private CodeGeneratorConfigure(Builder builder) {
         this.length = builder.length;
         this.charset = builder.charset;
         this.amount = builder.amount;
         this.space = builder.space;
-    }
-
-    public static CodeGeneratorConfigurer create(Integer length, Integer amount, String charset, Integer space) {
-        return new CodeGeneratorConfigurer(length, amount, charset, space);
     }
 
     public Integer getLength() {
@@ -110,8 +107,8 @@ public class CodeGeneratorConfigurer {
             return this;
         }
 
-        public CodeGeneratorConfigurer build(){
-            return new CodeGeneratorConfigurer(this);
+        public CodeGeneratorConfigure build(){
+            return new CodeGeneratorConfigure(this);
         }
 
     }

@@ -1,7 +1,7 @@
 package command;
 
 import code.CodeGeneratorConfigGetter;
-import code.CodeGeneratorConfigurer;
+import code.CodeGeneratorConfigure;
 import exception.CustomRuntimeException;
 import exception.CustomRuntimeExceptionCode;
 import voucher.VoucherService;
@@ -80,19 +80,19 @@ public abstract class AbstractCommand implements Command {
 
     // 코드 설정에 따라 코드를 검색할 정규식을 세팅합니다
     protected Pattern createRegex(String charset) {
-        if (charset.equals(CodeGeneratorConfigurer.Charset.NUMERIC)) {
+        if (charset.equals(CodeGeneratorConfigure.Charset.NUMERIC)) {
             return NUMERIC_REGEX;
         }
 
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_LOWERCASE)) {
+        if (charset.equals(CodeGeneratorConfigure.Charset.ALPHABET_LOWERCASE)) {
             return ALPHABET_LOWERCASE_REGEX;
         }
 
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET_UPPERCASE)) {
+        if (charset.equals(CodeGeneratorConfigure.Charset.ALPHABET_UPPERCASE)) {
             return ALPHABET_UPPERCASE_REGEX;
         }
 
-        if (charset.equals(CodeGeneratorConfigurer.Charset.ALPHABET)) {
+        if (charset.equals(CodeGeneratorConfigure.Charset.ALPHABET)) {
             return ALPHABET_REGEX;
         }
 

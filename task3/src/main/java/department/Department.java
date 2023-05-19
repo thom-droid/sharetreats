@@ -8,6 +8,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * 부서를 표현하는 클래스입니다.
+ * <p>
+ *     각 부서는 여러 하위 부서를 가질 수 있도록 {@link List}로 표현하였고,
+ *     상위부서는 하나만 가질 수 있도록 상위부서의 참조를 저장합니다.
+ *     최상위 부서의 정보를 쉽게 불러올 수 있도록 최상위 부서가 있는 경우 최상위 부서의 참조를 가지도록 했습니다.
+ * </p>
+ * <p>
+ *     부서 조직도에 변동이 생길 때 매번 변동된 모든 부서의 인원수를 다시 검색하지 않도록, {@code combinedHeadCount}
+ *     를 통해 캐싱합니다. 하위 부서가 추가되거나 상위부서가 바뀌는 경우 재귀적으로 상하위 부서를 탐색하는데, 이 때
+ *     이 캐시값이 있으면 바로 사용합니다.
+ * </p>
+ * <p>
+ *     최상위 부서는 {@code isRoot}의 값이 {@code true}인 객체이며, 이 필드는 요구사항에 정의된 것처럼 다른 부서의 하위 부서가
+ *     될 수 없도록 조건을 확인할 때 사용됩니다.
+ * </p>
+ * */
+
 public class Department {
 
     private static final String MESSAGE_WITHOUT_ROOT = "최상위 부서가 설정되어 있지 않아 현재 부서의 상위 부서 중 최고 부서의 정보가 표시됩니다.";
@@ -37,13 +55,35 @@ public class Department {
         return new Department(headCount, name, isRoot);
     }
 
+    public int getCombinedHeadCount() {
+        return combinedHeadCount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getHeadCount() {
+        return headCount;
+    }
+
+    public List<Department> getSubordinates() {
+        return subordinates;
+    }
+
+    public Department getRoot() {
+        return root;
+    }
+
     public void setAsRoot() {
+        // 최상위부서가 이미 있는 경우
         if (this.root != null) {
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.ROOT_IS_ALREADY_SET);
         }
 
         this.isRoot = true;
 
+        // 하위 부서가 있는 부서인 경우, 하위 부서의 최상위부서를 현재부서로 설정
         if (!this.subordinates.isEmpty()) {
             for (Department subordinate : subordinates) {
                 setRoot(subordinate, this);
@@ -51,6 +91,19 @@ public class Department {
         }
     }
 
+    /**
+     * 하위부서를 추가합니다.
+     * <p>
+     *     하위 부서의 인원 수와 현재 부서의 인원수를 더하여 {@code combinedHeadCount} 변수에 캐싱합니다.
+     *     하위 부서의 인원수에 캐싱된 값이 있다면 그것을 사용하고, 없는 경우 하위 부서의 모든 하위부서를 탐색하여
+     *     인원수를 구합니다.
+     * </p>
+     * <p>
+     *     현재 부서를 하위부서의 상위부서로 설정하고, 현재 부서에 최상위부서(root)가 설정되어 있다면
+     *     이 최상위부서를 하위부서의 최상위부서로 설정합니다. 이 작업은 하위 부서의 모든 하위부서에 재귀적으로
+     *     적용됩니다.
+     * </p>
+     * */
     public void add(Department subordinate) {
         // 추가하려는 부서가 null 이면 리턴
         if (subordinate == null) {
@@ -71,26 +124,6 @@ public class Department {
         // 새로 추가하는 부서의 사람 수를 현재 부서에 더해 캐시를 업데이트. 루트가 존재하는 경우 루트도 하위 부서에 설정
         Department root = findRootOrHighest();
         updateSubordinatesAndCache(subordinate, root);
-    }
-
-    public int getCombinedHeadCount() {
-        return combinedHeadCount;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getHeadCount() {
-        return headCount;
-    }
-
-    public List<Department> getSubordinates() {
-        return subordinates;
-    }
-
-    public Department getRoot() {
-        return root;
     }
 
     public void updateHeadcount(int headCount) {

@@ -4,8 +4,8 @@ package code;
 
 public interface CodeGeneratorConfigGetter {
 
-    CodeGeneratorConfigurer getItemCodeConfig();
+    CodeGeneratorConfigure getItemCodeConfig();
 
-    CodeGeneratorConfigurer getShopCodeConfig();
+    CodeGeneratorConfigure getShopCodeConfig();
 
 }

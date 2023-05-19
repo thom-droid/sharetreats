@@ -1,7 +1,7 @@
 package test_util;
 
 import code.CodeGenerator;
-import code.CodeGeneratorConfigurer;
+import code.CodeGeneratorConfigure;
 import code.CodeGeneratorConfigGetter;
 import mock.MockupData;
 import mock.MockupDataImpl;
@@ -19,7 +19,7 @@ import static voucher.Voucher.Status.USED;
 
 /** 테스트에 맞게 데이터를 가공하기 위해 만든 클래스입니다. 실제 런타임 시 사용되는 클래스는 {@link MockupDataImpl} 입니다.
  * 해당 타입의 인스턴스가 생성될 때 상품 교환권({@link Voucher})이 20장 발급되어 {@code voucherStorage}에 저장됩니다.
- * 상품 코드의 길이, 문자열타입 등의 설정은 클래스의 생성자 파라미터 값인 {@link CodeGeneratorConfigurer}의 설정을 통해 가능합니다. */
+ * 상품 코드의 길이, 문자열타입 등의 설정은 클래스의 생성자 파라미터 값인 {@link CodeGeneratorConfigure}의 설정을 통해 가능합니다. */
 
 public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
 
@@ -29,7 +29,7 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
     private final HashSet<String> itemCode;
     private final HashSet<String> shopCode;
 
-    public TestMockData(CodeGeneratorConfigurer itemCodeConfig, CodeGeneratorConfigurer shopCodeConfig) {
+    public TestMockData(CodeGeneratorConfigure itemCodeConfig, CodeGeneratorConfigure shopCodeConfig) {
         this.itemCodeGenerator = CodeGenerator.build(itemCodeConfig);
         this.itemCode = itemCodeGenerator.generate();
         this.shopCodeGenerator = CodeGenerator.build(shopCodeConfig);
@@ -41,10 +41,10 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
         this.itemCodeGenerator = CodeGenerator.build();
         this.itemCode = itemCodeGenerator.generate();
         this.shopCodeGenerator = CodeGenerator.build(
-                CodeGeneratorConfigurer.builder()
+                CodeGeneratorConfigure.builder()
                         .length(6)
                         .amount(4)
-                        .charset(CodeGeneratorConfigurer.Charset.ALPHABET)
+                        .charset(CodeGeneratorConfigure.Charset.ALPHABET)
                         .space(0)
                         .build());
         this.shopCode = shopCodeGenerator.generate();
@@ -111,12 +111,12 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
     }
 
     @Override
-    public CodeGeneratorConfigurer getItemCodeConfig() {
+    public CodeGeneratorConfigure getItemCodeConfig() {
         return itemCodeGenerator.getConfig();
     }
 
     @Override
-    public CodeGeneratorConfigurer getShopCodeConfig() {
+    public CodeGeneratorConfigure getShopCodeConfig() {
         return shopCodeGenerator.getConfig();
     }
 
