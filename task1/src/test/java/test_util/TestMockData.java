@@ -65,7 +65,7 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
         List<Voucher> vouchers = new ArrayList<>();
         List<Item> items = populateItem();
 
-        for (int i = 0; i < itemCode.size(); i++) {
+        for (int i = 0; i < itemCode.size() - 1; i++) {
 
             String code = (String) itemCode.toArray()[i];
             Item item = items.get(i);
@@ -76,6 +76,15 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
             vouchers.add(voucher);
 
         }
+
+        int size = itemCode.size();
+        String code = (String) itemCode.toArray()[size - 1];
+        Item item = items.get(size - 1);
+        VoucherDate voucherDate = VoucherDate.of(
+                LocalDateTime.of(2023, 1, 1, 0, 0),
+                LocalDateTime.of(2023, 1, 2, 0, 0));
+        Voucher voucher = Voucher.of(item.getId(), item, code, voucherDate);
+        vouchers.add(voucher);
 
         return vouchers;
     }

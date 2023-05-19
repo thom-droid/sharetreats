@@ -50,16 +50,4 @@ public final class Item {
         return grade;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Item item = (Item) o;
-        return Objects.equals(name, item.name) && grade == item.grade && Objects.equals(dueDate, item.dueDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, grade, dueDate);
-    }
 }

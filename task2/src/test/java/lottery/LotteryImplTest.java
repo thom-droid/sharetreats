@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LotteryImplTest {
 
-    LotteryInventory lotteryInventory = new TestLotteryInventory();
+    LotteryInventory lotteryInventory = new LotteryInventoryImpl();
     Lottery lottery = new LotteryImpl(lotteryInventory);
 
     @Test
