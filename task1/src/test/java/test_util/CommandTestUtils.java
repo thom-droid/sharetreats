@@ -64,11 +64,6 @@ public class CommandTestUtils {
         }
 
         @Override
-        public String process(String command) {
-            return supplier.get().process(command);
-        }
-
-        @Override
         public Command findCommand(String command) {
             MockEnumCommand enumCommand = Arrays.stream(this.getClass().getEnumConstants())
                     .filter(e -> e.name().equals(command.toUpperCase(Locale.ROOT)))

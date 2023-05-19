@@ -40,7 +40,13 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
     public TestMockData() {
         this.itemCodeGenerator = CodeGenerator.build();
         this.itemCode = itemCodeGenerator.generate();
-        this.shopCodeGenerator = CodeGenerator.build(CodeGeneratorConfigurer.create(6, 4, CodeGeneratorConfigurer.Charset.ALPHABET, 0));
+        this.shopCodeGenerator = CodeGenerator.build(
+                CodeGeneratorConfigurer.builder()
+                        .length(6)
+                        .amount(4)
+                        .charset(CodeGeneratorConfigurer.Charset.ALPHABET)
+                        .space(0)
+                        .build());
         this.shopCode = shopCodeGenerator.generate();
         setupStorage();
     }

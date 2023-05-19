@@ -52,28 +52,11 @@ public class CodeGeneratorConfigurer {
         this.space = space;
     }
 
-    public static CodeGeneratorConfigurer create() {
-        return new CodeGeneratorConfigurer(null, null, null, null);
-    }
-
-    public static CodeGeneratorConfigurer createWithLength(Integer length) {
-        return new CodeGeneratorConfigurer(length, null, null, null);
-    }
-
-    public static CodeGeneratorConfigurer createWithCharset(String charset) {
-        return new CodeGeneratorConfigurer(null, null, charset, null);
-    }
-
-    public static CodeGeneratorConfigurer createWithAmount(Integer amount) {
-        return new CodeGeneratorConfigurer(null, amount, null, null);
-    }
-
-    public static CodeGeneratorConfigurer create(Integer length, Integer amount) {
-        return new CodeGeneratorConfigurer(length, amount, null, null);
-    }
-
-    public static CodeGeneratorConfigurer create(Integer length, Integer amount, String charset) {
-        return new CodeGeneratorConfigurer(length, amount, charset, null);
+    private CodeGeneratorConfigurer(Builder builder) {
+        this.length = builder.length;
+        this.charset = builder.charset;
+        this.amount = builder.amount;
+        this.space = builder.space;
     }
 
     public static CodeGeneratorConfigurer create(Integer length, Integer amount, String charset, Integer space) {
@@ -96,4 +79,40 @@ public class CodeGeneratorConfigurer {
         return space;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private int length = 9;
+        private String charset = Charset.NUMERIC;
+        private int amount = 20;
+        private int space = 3;
+
+        public Builder length(int length) {
+            this.length = length;
+            return this;
+        }
+
+        public Builder charset(String charset) {
+            this.charset = charset;
+            return this;
+        }
+
+        public Builder amount(int amount) {
+            this.amount = amount;
+            return this;
+        }
+
+        public Builder space(int space) {
+            this.space = space;
+            return this;
+        }
+
+        public CodeGeneratorConfigurer build(){
+            return new CodeGeneratorConfigurer(this);
+        }
+
+    }
 }

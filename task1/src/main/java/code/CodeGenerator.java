@@ -32,7 +32,7 @@ public final class CodeGenerator {
     }
 
     public static CodeGenerator build() {
-        return new CodeGenerator(CodeGeneratorConfigurer.create());
+        return new CodeGenerator(CodeGeneratorConfigurer.builder().build());
     }
 
     public static CodeGenerator build(CodeGeneratorConfigurer config) {
@@ -67,7 +67,7 @@ public final class CodeGenerator {
     }
 
     public CodeGeneratorConfigurer getConfig() {
-        return CodeGeneratorConfigurer.create(length, amount, config.getCharset());
+        return this.config;
     }
 
 }

@@ -10,8 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CommandEnumTest {
 
-    CommandFactory commandFactory = new CommandFactoryImpl(CommandTestUtils.MockEnumCommand.class);
-    CommandEnumWrapper commandWrapper = commandFactory.createCommandProcessor();
+    CommandEnumWrapperFactory commandEnumWrapperFactory = new CommandEnumWrapperFactoryImpl(CommandTestUtils.MockEnumCommand.class);
+    CommandEnumWrapper commandWrapper = commandEnumWrapperFactory.createCommandEnumWrapper();
     CommandController commandController = new CommandController(commandWrapper);
     TestMockData mockupData = (TestMockData) CommandTestUtils.MockCommandInitiator.getMockupData();
 

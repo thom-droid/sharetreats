@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+/** Command 구현체를 싱글턴으로 생성하고 이름으로 편하게 사용하기 위해 정의한 Enum 클래스입니다.
+ * 각 원소마다 싱글턴으로 인스턴스화 된 Command 구현체를 가지고 있습니다. */
+
 public enum CommandEnum implements CommandEnumWrapper {
 
     CHECK(Check::getInstance, "CHECK"),
@@ -27,11 +30,6 @@ public enum CommandEnum implements CommandEnumWrapper {
         this.supplier = supplier;
         this.command = supplier.get();
         this.name = name;
-    }
-
-    @Override
-    public String process(String command) {
-        return this.command.process(command);
     }
 
     @Override

@@ -24,6 +24,7 @@ public class CommandController {
         String[] segments = segment(input);
         String commandSegment = segments[0].toUpperCase();
 
+        // 입력값의 명렁어 부분을 조건으로 수행할 Command 구현체를 찾습니다. 일치하는 명렁어가 없는 경우 예외를 출력합니다.
         Command command = commandEnumWrapper.findCommand(commandSegment);
         return command.process(input);
     }
