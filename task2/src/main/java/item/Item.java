@@ -35,7 +35,7 @@ public final class Item {
 
     @Override
     public String toString() {
-        return name + ", " + grade + ", " + dueDate;
+        return name + ", " + grade;
     }
 
     public LocalDateTime getDueDate() {

@@ -45,6 +45,9 @@ import java.util.stream.Collectors;
 
 public class LotteryInventoryImpl implements LotteryInventory {
 
+    private static final String[] A_ITEM_NAMES = new String[]{"COKE", "SODA", "AMERICANO", "CAFE LATTE", "CHOCOLATE"};
+    private static final String[] B_ITEM_NAMES = new String[]{"CHICKEN", "PIZZA", "BURGER", "PASTA", "STEAK"};
+
     private final List<Item> gradeA;
     private final List<Item> gradeB;
     private static final int chanceA = 90;
@@ -56,6 +59,8 @@ public class LotteryInventoryImpl implements LotteryInventory {
         this.gradeA = createAItem();
         this.gradeB = createBItem();
         this.countB = 3;
+        System.out.println("A 등급 상품 : " +Arrays.toString(A_ITEM_NAMES));
+        System.out.println("B 등급 상품 : " +Arrays.toString(B_ITEM_NAMES));
     }
 
     @Override
@@ -98,27 +103,20 @@ public class LotteryInventoryImpl implements LotteryInventory {
     }
 
     private ArrayList<Item> createAItem() {
-
-        String[] names = new String[]{"COKE", "SODA", "AMERICANO", "CAFE LATTE", "CHOCOLATE"};
         ArrayList<Item> items = new ArrayList<>();
 
-        for (String name : names) {
+        for (String name : A_ITEM_NAMES) {
             Item item = Item.of(name, Item.Grade.A, buildRandomDateTime());
             items.add(item);
-            System.out.println(item);
+
         }
 
         return items;
-
     }
 
     private ArrayList<Item> createBItem() {
-
-        String[] names = new String[]{"CHICKEN", "PIZZA", "BURGER", "PASTA", "STEAK"};
-
-        return Arrays.stream(names)
+        return Arrays.stream(B_ITEM_NAMES)
                 .map(s -> Item.of(s, Item.Grade.B, buildRandomDateTime()))
-                .peek(System.out::println)
                 .collect(Collectors.toCollection(ArrayList::new));
 
     }
