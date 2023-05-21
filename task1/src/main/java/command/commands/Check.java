@@ -13,16 +13,17 @@ import java.util.Arrays;
 
 public class Check extends AbstractCommand {
 
-    private static Check instance;
+    private static final Check instance;
 
     public static Check getInstance() {
-        if (instance == null) {
-            MockupData mockupData = MockupDataImpl.getInstance();
-            CodeGeneratorConfigGetter codeGeneratorConfigGetter = (CodeGeneratorConfigGetter) mockupData;
-            VoucherService voucherService1 = VoucherServiceImpl.getInstance();
-            instance = new Check(codeGeneratorConfigGetter, voucherService1);
-        }
         return instance;
+    }
+
+    static {
+        MockupData mockupData = MockupDataImpl.getInstance();
+        CodeGeneratorConfigGetter codeGeneratorConfigGetter = (CodeGeneratorConfigGetter) mockupData;
+        VoucherService voucherService1 = VoucherServiceImpl.getInstance();
+        instance = new Check(codeGeneratorConfigGetter, voucherService1);
     }
 
     private Check(CodeGeneratorConfigGetter codeGeneratorConfigGetter, VoucherService voucherService) {
