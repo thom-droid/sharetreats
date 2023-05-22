@@ -1,0 +1,163 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+package command {
+
+    enum CommandRegex {
+        COMMAND
+        COMMA
+        RELATION
+        UPDATE
+        UPPERCASE
+        ~ pattern: Pattern
+        ~ CommandRegex(Supplier<Pattern>)
+        + matches(String): boolean
+    }
+}
+
+package department {
+
+    DepartmentServiceImpl ..> DepartmentRepository
+    DepartmentController ..> DepartmentService
+
+    class Department {
+        - {static} MESSAGE_WITHOUT_ROOT: String
+        - headCount: int
+        - combinedHeadCount: int
+        - name: String
+        - subOrdinates: List<Department>
+        - superior: Department
+        - root: Department
+        - isRoot: boolean
+        + Department(int, String, boolean)
+        + {static} of(int, String): Department
+        + {static} of(int, String, boolean): Department
+        + getCombinedHeadCount(): int
+        + getName(): String
+        + getHeadCount(): int
+        + getSubordinates(): List<Department>
+        + getRoot(): Department
+        + setAsRoot(): void
+        + add(Department): void
+        + updateHeadcount(int): void
+        + getTotalHeadCountOfDepartment(): int
+        + isThisRoot(): boolean
+        + throwDuplicateNameException(): void
+        + relationToString(): String
+        + toString(): String
+        - findRootOrHighest(): Department
+        - alreadyRelatedTo(Department): boolean
+        - updateSubordinatesAndCache(Department, Department): void
+        - updateCombinedHeadCountFrom(Department): void
+        - updateRelationOf(Department): void
+        - remove(Department): void
+        - updateHeadCount(): void
+        - calculateHeadCount(): int
+        - setRoot(Department, Department): void
+        - relateTo(Department): void
+        - findRootOrHighest(Department, Department): Department
+        - {static} validate(int, String): void
+        - {static} validate(String): void
+        - {static} validate(int): void
+    }
+
+    class DepartmentController {
+        - departmentService: DepartmentService
+        + DepartmentController(DepartmentService)
+        + parseCommand(String): String
+        - segment(String, String): String[]
+        - validateLength(String[]): void
+        - validateName(String): String
+        - validateHeadCount(String): int
+        - toDepartmentFrom(String[]): Department
+    }
+
+    interface DepartmentRepository {
+        + {abstract} save(Department): Department
+        + {abstract} findAll(): List<Department>
+        + {abstract} findBy(String): Optional<Department>
+    }
+
+    class DepartmentRepositoryImpl implements DepartmentRepository {
+        - storage: Map<String, Department>
+        + DepartmentRepositoryImpl()
+        + save(Department): Department
+        + findAll(): List<Department>
+        + findBy(String): Optional<Department>
+        - setup(): void
+        - put(Department): void
+    }
+
+    interface DepartmentService {
+        + {abstract} getDepartment(String): String
+        + {abstract} post(Department): String
+        + {abstract} delete(String): void
+        + {abstract} update(Department): String
+        + {abstract} update(Department): String
+        + {abstract} relateTo(String, String): String
+    }
+
+    class DepartmentServiceImpl implements DepartmentService {
+        - departmentRepository: DepartmentRepository
+        + getDepartment(String): String
+        + post(Department): String
+        + delete(String): void
+        + update(Department): String
+        + update(Department): String
+        + relateTo(String, String): String
+        - findBy(String): Department
+    }
+
+}
+
+package exception {
+
+    CustomNumberFormatException ..> CustomNumberFormatExceptionCode
+
+    class CustomNumberFormatException extends NumberFormatException {
+        + CustomNumberFormatException(String)
+    }
+
+    class CustomRuntimeException extends RuntimeException {
+        - customNumberFormatExceptionCode: CustomNumberFormatExceptionCode
+        + CustomRuntimeException(CustomRuntimeExceptionCode)
+        + CustomRuntimeException(Throwable, CustomNumberFormatExceptionCode)
+        + getMessage(): String
+    }
+
+    enum CustomNumberFormatExceptionCode {
+        DUPLICATED_NAME
+        ROOT_CANNOT_BE_SUBORDINATED
+        ROOT_CANNOT_BE_DELETE
+        ROOT_IS_ALREADY_SET
+        NO_SUPERIOR_IS_SET
+        NO_SUCH_DEPARTMENT
+        NOT_VALID_NAME
+        NOT_VALID_HEADCOUNT
+        NOT_VALID_COMMAND
+        ~ message: String
+        ~ CustomNumberFormatExceptionCode(String)
+        + getMessage(): String
+    }
+}
+
+package test {
+
+    class DepartmentRepositoryTestImpl implements department.DepartmentRepository {
+        - storage: Map<String, Department>
+        + DepartmentRepositoryImpl()
+        + save(Department): Department
+        + findAll(): List<Department>
+        + findBy(String): Optional<Department>
+        - setup(): void
+        - put(Department): void
+        + getRandomName(): String
+        + getRemoveName(): String
+        + getRandomRootDepartment(): String
+    }
+}
+
+
+
+
+@enduml
