@@ -37,6 +37,7 @@ import java.util.Objects;
 public class VoucherServiceImpl implements VoucherService {
 
     private static VoucherService instance;
+    private final VoucherRepository voucherRepository;
 
     public static VoucherService getInstance() {
         if (instance == null) {
@@ -57,8 +58,6 @@ public class VoucherServiceImpl implements VoucherService {
     private VoucherServiceImpl(VoucherRepository voucherRepository) {
         this.voucherRepository = voucherRepository;
     }
-
-    private final VoucherRepository voucherRepository;
 
 //    public VoucherServiceImpl(VoucherRepository voucherRepository) {
 //        this.voucherRepository = voucherRepository;
@@ -149,11 +148,6 @@ public class VoucherServiceImpl implements VoucherService {
         voucherRepository.update(used);
 
         return used.toStringWithClaimedItem();
-    }
-
-    @Override
-    public String help() {
-        return "HELP";
     }
 
     private Voucher getVoucherIfValidated(String code) {

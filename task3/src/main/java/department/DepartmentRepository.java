@@ -11,6 +11,4 @@ public interface DepartmentRepository {
 
     Optional<Department> findBy(String name);
 
-    void delete(Department department);
-
 }

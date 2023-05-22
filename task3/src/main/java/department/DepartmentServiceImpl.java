@@ -21,11 +21,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
-    }
-
-    @Override
     public String post(Department department) {
         String name = department.getName();
         departmentRepository.findBy(name).ifPresent(Department::throwDuplicatedNameException);

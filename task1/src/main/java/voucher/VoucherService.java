@@ -9,6 +9,4 @@ public interface VoucherService {
 
     String claim(String shopCode, String ItemCode);
 
-    String help();
-
 }

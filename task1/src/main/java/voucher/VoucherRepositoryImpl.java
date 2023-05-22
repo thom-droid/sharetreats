@@ -10,6 +10,7 @@ import java.util.*;
 public class VoucherRepositoryImpl implements VoucherRepository {
 
     private static VoucherRepository instance;
+    private final MockupData mockDb;
 
     public static VoucherRepository getInstance() {
         if (instance == null) {
@@ -29,8 +30,6 @@ public class VoucherRepositoryImpl implements VoucherRepository {
     private VoucherRepositoryImpl(MockupData mockDb) {
         this.mockDb = mockDb;
     }
-
-    private final MockupData mockDb;
 
     @Override
     public Optional<Voucher> findByCode(String code) {

@@ -142,28 +142,17 @@ public class TestMockData implements MockupData, CodeGeneratorConfigGetter {
         return voucherStorage.get(code);
     }
 
-    public String getExpiredCode() {
-        return voucherStorage.values().stream()
-                .findAny()
-                .map(v -> Voucher.of(v.getId(), v.getItem(), v.getCode(), v.getAuditDate(), Voucher.Status.EXPIRED))
-                .get().getCode();
-    }
-
-    public Voucher getRandomVoucher() {
-        return voucherStorage.entrySet().stream().findAny().get().getValue();
-    }
-
     public Voucher getRandomExpiredVoucher() {
         return voucherStorage.values().stream()
                 .filter(v -> v.getStatus() != USED
-                        && v.getAuditDate().getExpirationDate().isBefore(LocalDateTime.of(2023, 1, 31, 0, 0)))
+                        && v.getVoucherDate().getExpirationDate().isBefore(LocalDateTime.of(2023, 1, 31, 0, 0)))
                 .findAny()
                 .get();
     }
 
     public Voucher getRandomAvailableVoucher() {
         return voucherStorage.values().stream()
-                .filter(v -> v.getAuditDate().getExpirationDate().isAfter(LocalDateTime.now()))
+                .filter(v -> v.getVoucherDate().getExpirationDate().isAfter(LocalDateTime.now()))
                 .findAny()
                 .get();
     }
