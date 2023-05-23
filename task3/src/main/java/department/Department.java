@@ -89,6 +89,7 @@ public class Department {
                 setRoot(subordinate, this);
             }
         }
+        updateHeadcount();
     }
 
     /**
