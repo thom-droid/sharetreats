@@ -30,17 +30,12 @@ public class DepartmentRepositoryTestImpl implements DepartmentRepository {
         return Optional.ofNullable(storage.get(name));
     }
 
-    @Override
-    public void delete(Department department) {
-        storage.remove(department.getName());
-    }
-
     private void setup() {
-        Department dev = new Department(10, "DEV", true);
+        Department dev = Department.of(10, "DEV", true);
         dev.setAsRoot();
-        Department backend = new Department(20, "BACKEND", false);
-        Department frontend = new Department(20, "FRONTEND", false);
-        Department devops = new Department(30, "DEVOPS", false);
+        Department backend = Department.of(20, "BACKEND", false);
+        Department frontend = Department.of(20, "FRONTEND", false);
+        Department devops = Department.of(30, "DEVOPS", false);
         dev.add(backend);
         dev.add(frontend);
         dev.add(devops);

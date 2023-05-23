@@ -1,0 +1,433 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+package code {
+
+    CodeGenerator ..> CodeGeneratorConfigure
+    Charset --+ CodeGenerator
+    Builder --+ CodeGenerator
+
+    class CodeGenerator {
+        - length: Integer
+        - amount: Integer
+        - chars: char[]
+        - space: Integer
+        - config: CodeGeneratorConfigure
+        - CodeGenerator(CodeGeneratorConfigure)
+        + {static} build(): CodeGenerator
+        + {static} build(CodeGeneratorConfigure): CodeGenerator
+        + generate(): HashSet<String>
+        - createCode(): String
+        + getConfig(): CodeGeneratorConfigure
+    }
+
+    interface CodeGeneratorConfigGetter {
+        + getItemCodeConfig(): CodeGeneratorConfigure
+        + getShopCodeConfig(): CodeGeneratorConfigure
+    }
+
+    class CodeGeneratorConfigure {
+        - length: Integer
+        - amount: Integer
+        - charset: String
+        - space: Integer
+        - CodeGeneratorConfigure(Builder)
+        + getLength(): Integer
+        + getAmount(): Integer
+        + getCharset(): String
+        + getSpace(): Integer
+        + {static} builder(): Builder
+    }
+
+    class Charset <<utility>>{
+        + {static} ALPHABET: String
+        + {static} ALPHABET_UPPERCASE: String
+        + {static} ALPHABET_LOWERCASE: String
+        + {static} ALPHABET_NUMERIC: String
+    }
+
+    class Builder {
+        - length: int
+        - amount: int
+        - space: int
+        - charset: String
+        + length(int): Builder
+        + amount(int): Builder
+        + space(int): Builder
+        + charset(String): Builder
+        + build(): CodeGeneratorConfigure
+    }
+
+}
+
+package command {
+
+    Command <|.. AbstractCommand
+    CommandController ..> CommandEnumWrapper
+    CommandEnumWrapper <|.. CommandEnum
+    CommandEnumWrapperFactory <|.. CommandEnumWrapperFactoryImpl
+    CommandEnumWrapper <-- CommandEnumWrapperFactoryImpl : <<create>>
+
+    abstract class AbstractCommand {
+        - {static} NUMERIC_REGEX: Pattern
+        - {static} ALPHABET_LOWERCASE_REGEX: Pattern
+        - {static} ALPHABET_UPPERCASE_REGEX: Pattern
+        - {static} ALPHABET_REGEX: Pattern
+        # itemCodeLength: int
+        # shopCodeLength: int
+        # itemCodeCharset: String
+        # shopCodeCharset: String
+        # voucherService: VoucherService
+        - codeGeneratorConfigGetter: CodeGeneratorConfigGetter
+        # AbstractCommand(CodeGeneratorConfigGetter, VoucherService)
+        # {abstract} parse(String): String[]
+        # segment(String): String[]
+        # createValidatedItemCodeFrom(String[]): String
+        # createRegex(String): Pattern
+    }
+
+    interface Command {
+        + {abstract} process(String): String
+    }
+
+    class CommandController {
+        - commandEnumWrapper: CommandEnumWrapper
+        + CommandController(CommandEnumWrapper)
+        + process(String) : String
+        - segment(String): String[]
+    }
+
+    enum CommandEnum {
+        CHECK
+        HELP
+        CLAIM
+        EXIT
+        ~ supplier: Supplier<Command>
+        ~ command: Command
+        ~ name: String
+        ~ CommandEnum(Supplier<Command>, String)
+        + findCommand(String): Command
+        + getCommand(): Command
+    }
+
+    interface CommandEnumWrapper {
+        + findCommand(String): Command
+    }
+
+    interface CommandEnumWrapperFactory {
+        + {abstract} createCommandEnumWrapper(): CommandEnumWrapper
+    }
+
+    class CommandEnumWrapperFactoryImpl {
+        - commandEnum: Class<? extends CommandEnumWrapper>
+        + CommandEnumWrapperFactoryImpl(Class<? extends CommandEnumWrapper)
+        + createCommandEnumWrapper(): CommandEnumWrapper
+    }
+
+    package commands {
+
+        command.AbstractCommand <|-- Check
+        command.AbstractCommand <|-- Claim
+        command.AbstractCommand <|-- Help
+        command.AbstractCommand <|-- Exit
+
+        class Check {
+            - {static} instance: Check
+            - Check(CodeGeneratorConfigGetter, VoucherService)
+            + {static} getInstance(): Check
+            + process(String): String
+            + parse(String): String[]
+            - validate(String[]): void
+        }
+
+        class Claim {
+             - {static} instance: Claim
+             - Claim(CodeGeneratorConfigGetter, VoucherService)
+             + {static} getInstance(): Claim
+             + process(String): String
+             + parse(String): String[]
+             - validate(String[]): void
+             - validateSegments(String[]): void
+             - validateShopCode(String): void
+        }
+
+        class Exit {
+            - {static} instance: Exit
+            - Exit(CodeGeneratorConfigGetter, VoucherService)
+            + {static} getInstance(): Exit
+            + process(String): String
+            + parse(String): String[]
+        }
+
+        class Help {
+            + {static} MESSAGE: String
+            - {static} instance: Help
+            - Help(CodeGeneratorConfigGetter, VoucherService)
+            + {static} getInstance(): Help
+            + process(String): String
+            + parse(String): String[]
+        }
+    }
+}
+
+package exception {
+
+    CustomRuntimeException ..> CustomRuntimeExceptionCode
+
+    class CustomRuntimeException extends RuntimeException {
+        - message: String
+        + CustomRuntimeException(CustomRuntimeExceptionCode)
+        + getMessage(): String
+    }
+
+    enum CustomRuntimeExceptionCode {
+        NOT_VALID_CODE
+        EXPIRED_CODE
+        ALREADY_USED_CODE
+        SHOPCODE_NOT_MATCHED
+        EMPTY_COMMAND
+        ILLEGAL_ARGUMENT
+        ILLEGAL_ARGUMENT_MALFORMED_CODE
+        ILLEGAL_ARGUMENT_MISTYPED_COMMAND
+        ILLEGAL_ARGUMENT_NOT_MATCHED_SPACE
+        ~ code: int
+        ~ message: String
+        ~ CustomRuntimeExceptionCode(int, String)
+        + getMessage(): String
+    }
+
+}
+
+package mock {
+
+    interface MockupData {
+        + {abstract} getOne(String): Voucher
+        + {abstract} save(Voucher): void
+    }
+
+    class MockupDataImpl implements MockupData, code.CodeGeneratorConfigGetter {
+        - {static} instance: MockupData
+        - voucherStorage: Map<String,Voucher>
+        - itemCodeGenerator: CodeGenerator
+        - shopCodeGenerator: CodeGenerator
+        - itemCode: Set<String>
+        - shopCode: Set<String>
+        - MockupDataImpl()
+        + {static} getInstance(): MockupData
+        - setupStorage(): void
+        - populateVoucher(): List<Voucher>
+        - populateItem(): List<Item>
+        - populateShop(): List<Shop>
+        - buildRandomDateTime(): LocalDateTime
+        + getOne(String): Voucher
+        + save(Voucher): void
+        + getItemCodeConfig(): CodeGeneratorConfigure
+        + getShopCodeConfig(): CodeGeneratorConfigure
+    }
+}
+
+package shop {
+
+    Item -- Shop
+    class Item {
+        - id: int
+        - name: String
+        - shop: Shop
+        - Item(int, String, Shop)
+        + {static} of(int, String, Shop): Item
+        + {static} of(Item): Item
+        + getId(): int
+        + getName(): String
+        + getShop(): Shop
+
+    }
+
+    class Shop {
+        - id: int
+        - code: String
+        - items: List<Item>
+        - Shop(int, String)
+        - Shop(int, String, List<Item>)
+        + {static} of(int, String): Shop
+        + {static} of(Shop): Shop
+        + getId(): int
+        + getCode(): String
+        + getItems(): List<Item>
+        + addItem(Item): void
+    }
+
+
+}
+
+package voucher {
+
+    VoucherService <.down. command.commands.Check
+    VoucherService <.down. command.commands.Claim
+    VoucherService <.down. command.commands.Help
+    VoucherService <.down. command.commands.Exit
+
+    Voucher --> Item
+    Status --+ Voucher
+    ExpirationPeriod --+ VoucherDate
+    Voucher -- VoucherDate
+    VoucherServiceImpl ..> VoucherRepository
+    VoucherRepositoryImpl ..> mock.MockupData
+
+    class Voucher {
+        - id: int
+        - status: Status
+        - item: Item
+        - code: String
+        - voucherDate: VoucherDate
+        - Voucher(int, Item, String, ExpirationPeriod, VoucherDate, Status)
+        + {static} of(int, Item, String, VoucherDate): Voucher
+        + {static} of(int, Item, String, VoucherDate, Status): Voucher
+        + getId(): int
+        + getItem(): Item
+        + getCode(): String
+        + getVoucherDate(): VoucherDate
+        + checkShopCode()
+        - isNotIssuedFrom(String): boolean
+        + checkAvailability(): void
+        + updateAsUsed(): Voucher
+        + updateStatus(): Voucher
+        + getStatus: Status
+        + toStringWithClaimedItem(): String
+        + toStringWithAvailability(): String
+        + toString(): String
+    }
+
+    enum Status {
+        AVAILABLE
+        EXPIRED
+        USED
+        ~ code: int
+        ~ message: String
+        ~ Status(int, String)
+        + getMessage(): String
+    }
+
+    class VoucherDate {
+        - issueDate: LocalDateTime
+        - expirationDate: LocalDateTime
+        - usedDate: LocalDateTime
+        - expirationPeriod: ExpirationPeriod
+        - VoucherDate(ExpirationPeriod)
+        - VoucherDate(LocalDateTime, LocalDateTime, ExpirationPeriod)
+        - VoucherDate(VoucherDate)
+        + {static} of(VoucherDate): VoucherDate
+        + {static} of(ExpirationPeriod): VoucherDate
+        + {static} of(LocalDateTime, ExpirationPeriod): VoucherDate
+        + {static} of(LocalDateTime, LocalDateTime): VoucherDate
+        + getIssueDate(): LocalDateTime
+        + getExpirationDate(): LocalDateTime
+        + getExpirationPeriod(): ExpirationPeriod
+        + getUsedDate(): LocalDateTime
+        + updateUsedDate(): VoucherDate
+    }
+
+    enum ExpirationPeriod {
+        DAY
+        WEEK
+        TWO_WEEKS
+        MONTH
+        THREE_MONTHS
+        ~ days: int
+        ~ ExpirationPeriod(int)
+        + getDays(): int
+    }
+
+    interface VoucherRepository {
+        + {abstract} findByCode(String): Optional<Voucher>
+        + {abstract} update(Voucher): void
+    }
+
+    class VoucherRepositoryImpl implements VoucherRepository {
+        - {static} instance: VoucherRepository
+        - VoucherRepositoryImpl(MockupData)
+        + {static} getInstance(): VoucherRepository
+        + {static} getInstance(MockupData): VoucherRepository
+        + findByCode(String): Optional<Voucher>
+        + update(Voucher): void
+    }
+
+    interface VoucherService {
+        + {abstract} check(String): String
+        + {abstract} claim(String, String): String
+    }
+
+    class VoucherServiceImpl implements VoucherService {
+        - {static} instance: VoucherService
+        - voucherRepository: VoucherRepository
+        - VoucherRepositoryImpl(VoucherRepository)
+        + {static} getInstance(): VoucherService
+        + {static} getInstance(MockupData): VoucherService
+        + check(String): String
+        + claim(String, String): String
+        - getVoucherIfValidated(String): Voucher
+    }
+
+}
+
+package test {
+
+    MockEnumCommand --+ CommandTestUtils
+    MockCommandInitiator --+ CommandTestUtils
+    MockCommandInitiator -- mock.MockupData
+    MockCommandInitiator -- code.CodeGeneratorConfigGetter
+    MockCommandInitiator -left- voucher.VoucherService
+
+    class TestMockData implements mock.MockupData, code.CodeGeneratorConfigGetter {
+            - voucherStorage: Map<String,Voucher>
+            - itemCodeGenerator: CodeGenerator
+            - shopCodeGenerator: CodeGenerator
+            - itemCode: Set<String>
+            - shopCode: Set<String>
+            + TestMockData()
+            - setupStorage(): void
+            - populateVoucher(): List<Voucher>
+            - populateItem(): List<Item>
+            - populateShop(): List<Shop>
+            - buildRandomDateTime(): LocalDateTime
+            + getOne(String): Voucher
+            + save(Voucher): void
+            + getItemCodeConfig(): CodeGeneratorConfigure
+            + getShopCodeConfig(): CodeGeneratorConfigure
+            + getAnyCode(): String
+            + getAnyShopCode(): String
+            + getRandomExpiredVoucher(): Voucher
+            + getRandomAvailableVoucher(): Voucher
+            + getRandomCodeFromDifferentShop(String): String
+    }
+
+    class CommandTestUtils {
+    }
+
+    enum MockEnumCommand implements command.CommandEnumWrapper {
+        CHECK
+        CLAIM
+        HELP
+        EXIT
+        ~ supplier: Supplier<Command>
+        ~ command: Command
+        ~ name: String
+        ~ CommandEnum(Supplier<Command>, String)
+        + findCommand(String): Command
+        + getCommand(): Command
+    }
+
+    class MockCommandInitiator <<utility>> {
+        - {static} MOCKUP_DATA: MockupData
+        - {static} CODE_GENERATOR_CONFIG_GETTER: CodeGeneratorConfigGetter
+        - {static} VOUCHER_SERVICE: VoucherService
+        + {static} getMockupData: MockupData
+        + {static} getVoucherService: VoucherService
+        + {static} getCheck(): Check
+        + {static} getClaim(): Claim
+        + {static} getHelp(): Help
+        + {static} getExit(): Exit
+    }
+}
+
+@enduml

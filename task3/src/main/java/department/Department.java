@@ -38,7 +38,7 @@ public class Department {
     private Department root;
     private boolean isRoot;
 
-    public Department(int headCount, String name, boolean isRoot) {
+    private Department(int headCount, String name, boolean isRoot) {
         this.headCount = headCount;
         this.name = name;
         this.subordinates = new LinkedList<>();
@@ -171,19 +171,6 @@ public class Department {
 
     public String toString() {
         return "현재부서: [ " + this.getName() + " ], 현재부서의 인원: [ " + this.headCount + " ] ";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Department that = (Department) o;
-        return Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 
     private Department findRootOrHighest() {

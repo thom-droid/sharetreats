@@ -1,0 +1,85 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+package item {
+
+class Item
+enum Grade
+
+Item +-- Grade
+
+class Item {
+- name: String
+- grade: Grade
+- dueDate: LocalDateTime
+- Item(String, grade, LocalDateTime)
++ {static} of (String, Grade, LocalDateTime): Item
++ toStringWhenSucceeds(): String
++ getDueDate(): LocalDateTime
++ getName(): String
++ getGrade(): Grade
++ toString(): String
+}
+
+
+enum Grade {
+A
+B
+}
+}
+
+package lottery {
+
+
+Lottery <|.. LotteryImpl
+LotteryInventory <|.. LotteryInventoryImpl
+Item -- LotteryInventoryImpl
+LotteryImpl ..> LotteryInventory
+
+    interface Lottery {
+        + {static} PRICE: int
+        + {abstract} draw(Wallet, int, LocalDateTime): String
+    }
+
+    class LotteryImpl {
+        - lotteryInventory: LotteryInventory
+        + LotteryImpl(LotteryInventory)
+        + draw(Wallet, int, LocalDateTime): String
+    }
+
+    interface LotteryInventory {
+        + {abstract} pick(LocalDateTime): Optional<Item>
+    }
+
+    class LotteryInventoryImpl {
+        - {static} A_ITEM_NAMES: String[]
+        - {static} B_ITEMS_NAMES: String[]
+        - {static} chanceA: int
+        - {static} chanceB: int
+        - gradeA: List<Item>
+        - gradeB: List<Item>
+        - countB: int
+        + LotteryInventoryImpl()
+        + pick(LocalDateTime): Optional<Item>
+        - pickA(LocalDateTime): Optional<Item>
+        - pickB(LocalDateTime): Optional<Item>
+        - createAItem(): ArrayList<Item>
+        - createBItem(): ArrayList<Item>
+        - buildRandomDateTime(): LocalDateTime
+    }
+}
+
+package wallet {
+    class Wallet {
+        - balance: int
+        + Wallet(int)
+        + topUp(int): void
+        + topUp(): void
+        + getBalance(): int
+        + subtract(int): void
+        + subtract(): void
+        + hasEnoughBalance(): boolean
+    }
+}
+
+@enduml

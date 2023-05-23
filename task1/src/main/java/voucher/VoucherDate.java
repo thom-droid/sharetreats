@@ -79,8 +79,8 @@ public final class VoucherDate {
 
         final int days;
 
-        ExpirationPeriod(int month) {
-            this.days = month;
+        ExpirationPeriod(int days) {
+            this.days = days;
         }
 
         public int getDays() {

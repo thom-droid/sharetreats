@@ -49,7 +49,7 @@ public final class Voucher {
         return code;
     }
 
-    public VoucherDate getAuditDate() {
+    public VoucherDate getVoucherDate() {
         return VoucherDate.of(voucherDate);
     }
 
@@ -95,7 +95,6 @@ public final class Voucher {
         USED(3, "사용 완료");
 
         final int code;
-
         final String message;
 
         Status(int code, String message) {
@@ -116,7 +115,7 @@ public final class Voucher {
         return "상품 [" + this.getItem().getName() + "] 교환을 성공하였습니다.. \n" +
                 "교환코드 : [ " + this.getCode() + " ] \n" +
                 "교환상점 : [ " + this.item.getShop().getCode() + " ] \n" +
-                "사용날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getUsedDate()) + " ] ";
+                "사용날짜 : [ " + Formatter.convertDateToString(this.getVoucherDate().getUsedDate()) + " ] ";
     }
 
     public String toStringWithAvailability() {
@@ -125,11 +124,11 @@ public final class Voucher {
                 "상태 : [ " + this.getStatus().getMessage() + " ] \n" +
                 "교환코드 : [ " + this.getCode() + " ] \n" +
                 "상점코드 : [ " + this.getItem().getShop().getCode() + " ] \n" +
-                "발급날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getIssueDate()) + " ] \n" +
-                "만료날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getExpirationDate()) + " ] \n";
+                "발급날짜 : [ " + Formatter.convertDateToString(this.getVoucherDate().getIssueDate()) + " ] \n" +
+                "만료날짜 : [ " + Formatter.convertDateToString(this.getVoucherDate().getExpirationDate()) + " ] \n";
 
-        if (this.getAuditDate().getUsedDate() != null) {
-            usedDate = "\n사용날짜 : [ " + Formatter.convertDateToString(this.getAuditDate().getUsedDate()) + " ] ";
+        if (this.getVoucherDate().getUsedDate() != null) {
+            usedDate = "\n사용날짜 : [ " + Formatter.convertDateToString(this.getVoucherDate().getUsedDate()) + " ] ";
         }
         return message + usedDate;
     }
