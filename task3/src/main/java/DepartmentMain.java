@@ -21,6 +21,7 @@ public class DepartmentMain {
                     "- 부서 관계 설정: [상위부서]>[하위부서]\n" +
                     "e.g. DEV>BACKEND 또는 *>DEV \n" +
                     "*는 최상위 부서를 의미합니다. 최상위 부서가 설정되어 있지 않더라도, 부서 간의 상하관계는 설정 가능합니다. \n" +
+                    "최상위 부서가 이미 설정되어 있는 부서는 최상위부서로 만들 수 없습니다. \n" +
                     "\n" +
                     "- 부서 조회: [부서이름]\n" +
                     "e.g. DEV\n" +
@@ -41,7 +42,7 @@ public class DepartmentMain {
                     "예를 들어 위의 예시에서 D, 20가 추가되고 *>D를 한 뒤 D>A를 하면, *>D>A>B>C의 조직도가 형성되고, 부서의 총 인원수도 50으로 조정됩니다. \n" +
                     "만약 A가 아닌 D>B를 하게 되면, A는 조직에서 제외되어 *>D>B>C의 조직이 형성되고, 인원수는 40이 됩니다. A 조직은 사라지지는 않습니다. \n" +
                     "\n" +
-                    "";
+                    "*>DEV(10), DEV>FRONTEND(20), DEV>BACKEND(30), DEV>DEVOPS(20) 총 80명이 포함된 조직이 기본으로 저장되어 있습니다.";
 
     public static void main(String[] args) throws IOException {
 

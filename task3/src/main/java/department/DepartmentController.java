@@ -66,6 +66,7 @@ public class DepartmentController {
     }
 
     private String validateName(String name) {
+        if(name.equals("*")) return name;
         if (!CommandRegex.UPPERCASE.matches(name))
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_NAME);
         return name;

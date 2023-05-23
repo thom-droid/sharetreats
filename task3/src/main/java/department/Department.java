@@ -309,6 +309,7 @@ public class Department {
     }
 
     private static void validate(String departmentName) {
+        if(departmentName.equals("*")) return ;
         if (!CommandRegex.UPPERCASE.matches(departmentName))
             throw new CustomRuntimeException(CustomRuntimeExceptionCode.NOT_VALID_NAME);
     }
