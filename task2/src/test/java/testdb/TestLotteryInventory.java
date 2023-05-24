@@ -65,7 +65,7 @@ public class TestLotteryInventory implements LotteryInventory {
             if (chanceB >= chance) {
                 countB--;
                 Collections.shuffle(gradeB);
-                return gradeB.stream().filter(i -> i.getDueDate().isBefore(drawTime)).findAny();
+                return gradeB.stream().filter(i -> i.getDueDate().isAfter(drawTime)).findAny();
             }
         }
 
@@ -96,7 +96,7 @@ public class TestLotteryInventory implements LotteryInventory {
 
     private LocalDateTime buildRandomDateTime() {
         LocalDate start = LocalDate.of(2023, 1, 1);
-        LocalDate end = LocalDate.now();
+        LocalDate end = LocalDate.of(2023, 12, 31);
         Random random = new Random();
 
         Period period = Period.between(start, end);

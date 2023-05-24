@@ -59,7 +59,7 @@ class LotteryImplTest {
 
         //then
         for (LocalDateTime datePart : dateParts) {
-            assertTrue(datePart.isBefore(drawTime));
+            assertTrue(datePart.isAfter(drawTime));
         }
 
     }
